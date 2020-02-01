@@ -5,7 +5,7 @@ using System;
 using UnityEngine.Assertions;
 using System.Linq;
 
-namespace Pattern
+namespace ProgrammingPattern
 {
 	public abstract class FiniteStateMachine<T>
 	{
