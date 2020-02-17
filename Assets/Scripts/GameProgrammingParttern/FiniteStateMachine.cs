@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-using UnityEngine.Assertions;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace ProgrammingPattern
 {
@@ -21,6 +19,11 @@ namespace ProgrammingPattern
 	{
 		private List<FiniteState> listStates_ = new List<FiniteState>();
 		public FiniteState Current { get; protected set; }
+
+		public FiniteStateMachine()
+		{
+			Initialize();
+		}
 
 		public abstract void Initialize();
 
@@ -42,43 +45,6 @@ namespace ProgrammingPattern
 			Current?.OnLeave();
 			Current = nextState;
 			Current?.OnEnter();
-		}
-	}
-
-	public class ExampleStateManager : FiniteStateMachine<ExampleStateManager>
-	{
-		public enum State : int
-		{
-			None = 0,
-			Test1 = 1,
-		}
-
-		public override void Initialize()
-		{
-			AddState(new ExampleState((int)State.None));
-			AddState(new ExampleState((int)State.Test1));
-		}
-
-		public void ChangeState(State nextID)
-		{
-			base.ChangeState((int)nextID);
-		}
-	}
-
-	public class ExampleState : FiniteState
-	{
-		public ExampleState(int id) : base(id)
-		{
-		}
-
-		public override void OnEnter()
-		{
-			Debug.Log("<< endter " + ID);
-		}
-
-		public override void OnLeave()
-		{
-			Debug.Log(">> leave " + ID);
 		}
 	}
 }
