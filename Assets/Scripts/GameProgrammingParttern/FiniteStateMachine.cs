@@ -25,15 +25,16 @@ namespace ProgrammingPattern
 			Initialize();
 		}
 
-		public abstract void Initialize();
+		protected abstract void Initialize();
 
-		public virtual void AddState(FiniteState state)
+		public virtual FiniteState AddState(FiniteState state)
 		{
 			var duplicate = listStates_.Find(o => o.GetID() == state.GetID());
 			if (duplicate == null) {
 				listStates_.Add(state);
+				return state;
 			} else {
-				Debug.LogError("duplicate id " + state.GetID());
+				return null;
 			}
 		}
 

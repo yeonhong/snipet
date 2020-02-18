@@ -13,11 +13,7 @@ namespace Tests.ProgrammingPattern
 			Test1 = 1,
 		}
 
-		public override void Initialize()
-		{
-			AddState(new ExampleState((int)State.None));
-			AddState(new ExampleState((int)State.Test1));
-		}
+		protected override void Initialize() { }
 
 		public void ChangeState(State nextID)
 		{
@@ -50,15 +46,23 @@ namespace Tests.ProgrammingPattern
 		public void Setup()
 		{
 			stateManager = new ExampleStateManager();
+			stateManager.AddState(new ExampleState((int)ExampleStateManager.State.None));
+			stateManager.AddState(new ExampleState((int)ExampleStateManager.State.Test1));
 		}
 
-		// A Test behaves as an ordinary method
 		[Test]
 		public void ChangeStateTest()
 		{
-			stateManager.ChangeState(ExampleStateManager.State.Test1);
-			Assert.IsTrue(stateManager.Current.GetID() == (int)ExampleStateManager.State.Test1);
+			stateManager.ChangeState(1);
+			Assert.IsTrue(stateManager.Current.GetID() == 1);
 		}
+
+		[Test]
+		public void AddDuplicateStateTest() {
+			var added = stateManager.AddState(new ExampleState(1));
+			Assert.IsNull(added);
+		}
+
 
 		//// A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
 		//// `yield return null;` to skip a frame.
