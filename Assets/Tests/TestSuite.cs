@@ -23,7 +23,7 @@ namespace Tests.ProgrammingPattern
 
 	public class ExampleState : FiniteState
 	{
-		public ExampleState(int id) : base(id)
+		public ExampleState(ExampleStateManager.State id) : base((int)id)
 		{
 		}
 
@@ -38,7 +38,7 @@ namespace Tests.ProgrammingPattern
 		}
 	}
 
-	public class TestSuite
+	public class FiniteStateMachineTest
 	{
 		ExampleStateManager stateManager = null;
 
@@ -46,8 +46,8 @@ namespace Tests.ProgrammingPattern
 		public void Setup()
 		{
 			stateManager = new ExampleStateManager();
-			stateManager.AddState(new ExampleState((int)ExampleStateManager.State.None));
-			stateManager.AddState(new ExampleState((int)ExampleStateManager.State.Test1));
+			stateManager.AddState(new ExampleState(ExampleStateManager.State.None));
+			stateManager.AddState(new ExampleState(ExampleStateManager.State.Test1));
 		}
 
 		[Test]
