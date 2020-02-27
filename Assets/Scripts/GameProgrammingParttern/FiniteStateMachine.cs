@@ -27,7 +27,7 @@ namespace ProgrammingPattern
 
 		protected abstract void Initialize();
 
-		public virtual FiniteState AddState(FiniteState state)
+		protected virtual FiniteState AddState(FiniteState state)
 		{
 			var duplicate = listStates_.Find(o => o.GetID() == state.GetID());
 			if (duplicate == null) {

@@ -7,36 +7,41 @@ namespace Tests.ProgrammingPattern
 {
 	public class ExampleStateManager : FiniteStateMachine<ExampleStateManager>
 	{
-		public enum State : int
+		public enum eState : int
 		{
 			None = 0,
 			Test1 = 1,
 		}
 
-		protected override void Initialize() { }
+		public eState State { get { return (eState)Current.GetID(); } }
 
-		public void ChangeState(State nextID)
+		protected override void Initialize() {
+			AddState(new ExampleState(eState.None));
+			AddState(new ExampleState(eState.Test1));
+		}
+
+		public void ChangeState(eState nextID)
 		{
 			base.ChangeState((int)nextID);
 		}
-	}
 
-	public class ExampleState : FiniteState
-	{
-		public ExampleState(ExampleStateManager.State id) : base((int)id)
+		public class ExampleState : FiniteState
 		{
-		}
+			public ExampleState(eState id) : base((int)id) {	}
 
-		public override void OnEnter()
-		{
-			Debug.Log("<< endter " + ID);
-		}
+			public override void OnEnter()
+			{
+				Debug.Log("<< endter " + ID);
+			}
 
-		public override void OnLeave()
-		{
-			Debug.Log(">> leave " + ID);
+			public override void OnLeave()
+			{
+				Debug.Log(">> leave " + ID);
+			}
 		}
 	}
+
+
 
 	public class FiniteStateMachineTest
 	{
@@ -46,21 +51,13 @@ namespace Tests.ProgrammingPattern
 		public void Setup()
 		{
 			stateManager = new ExampleStateManager();
-			stateManager.AddState(new ExampleState(ExampleStateManager.State.None));
-			stateManager.AddState(new ExampleState(ExampleStateManager.State.Test1));
 		}
 
 		[Test]
 		public void ChangeStateTest()
 		{
-			stateManager.ChangeState(1);
-			Assert.IsTrue(stateManager.Current.GetID() == 1);
-		}
-
-		[Test]
-		public void AddDuplicateStateTest() {
-			var added = stateManager.AddState(new ExampleState(1));
-			Assert.IsNull(added);
+			stateManager.ChangeState(ExampleStateManager.eState.Test1);
+			Assert.IsTrue(stateManager.State == ExampleStateManager.eState.Test1);
 		}
 
 
