@@ -41,8 +41,6 @@ namespace Tests.ProgrammingPattern
 		}
 	}
 
-
-
 	public class FiniteStateMachineTest
 	{
 		ExampleStateManager stateManager = null;
