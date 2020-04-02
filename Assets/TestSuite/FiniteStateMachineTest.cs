@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using ProgrammingPattern;
-using Tests.ProgrammingPattern;
 using UnityEngine;
 
 namespace Tests.ProgrammingPattern
