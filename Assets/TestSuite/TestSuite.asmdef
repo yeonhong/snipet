@@ -1,5 +1,5 @@
 {
-    "name": "_TestSuite",
+    "name": "TestSuite",
     "references": [
         "_GameProgrammingPattern"
     ],
