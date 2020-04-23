@@ -13,17 +13,12 @@ public class FormationSample : MonoBehaviour
 
 	// Use this for initialization
 	private void Start() {
-
+		formationGrid.AssignObjectsToGrid(units);
+		formationGrid.ChangeState(FormationStates.Form);
 	}
 
 	// Update is called once per frame
 	private void Update() {
-		// init formation
-		if (Input.GetKeyUp(KeyCode.A)) {
-			formationGrid.AssignObjectsToGrid(units);
-			formationGrid.ChangeState(FormationStates.Form);
-		}
-
 		if (Input.GetKeyUp(KeyCode.X)) {
 			Debug.Log("Disband!");
 			formationGrid.ChangeState(FormationStates.Disband);

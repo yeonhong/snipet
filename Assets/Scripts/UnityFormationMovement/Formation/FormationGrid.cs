@@ -5,7 +5,6 @@ using UnityEngine.AI;
 
 namespace com.t7t.formation
 {
-
 	/**
      * This is the key class which implements the FormationGrid setup and movement (=following ths FormationAnchor).
      * It uses an anchor, not a leader.
@@ -204,6 +203,8 @@ namespace com.t7t.formation
 		// Change the state of the FormationGrid and perform associated actions
 		public void ChangeState(FormationStates newstate) {
 
+			Debug.LogWarning("ChangeState " + newstate);
+
 			switch (newstate) {
 				case FormationStates.Form:
 					Debug.Log("Changing state to Form");
@@ -220,8 +221,9 @@ namespace com.t7t.formation
 					// Allow all grid assigned units to search and move towards the grid points:
 					ChangeMoveStateOnGridObjects(true);
 					ChangeAnimationStateOnGridObjects(true);
-					state = newstate;
 
+					state = newstate;
+					
 					if (audioSource) {
 						audioSource.mute = false;
 					}
@@ -259,6 +261,7 @@ namespace com.t7t.formation
 					// All grid assigned units stop search and move because formation move needs to take over:
 					ChangeMoveStateOnGridObjects(false);
 					ChangeAnimationStateOnGridObjects(false);
+
 					state = newstate;
 
 					if (audioSource) {
@@ -274,6 +277,7 @@ namespace com.t7t.formation
 
 					state = newstate;
 					break;
+
 				default:
 					if (audioSource) {
 						audioSource.mute = true;

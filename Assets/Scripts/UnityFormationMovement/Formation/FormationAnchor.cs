@@ -7,7 +7,6 @@ using Pathfinding;
 
 namespace com.t7t.formation
 {
-
 	/*
      * This is the Anchor of the FormationGrid and is derived from AIPath since this will be following the path while the grid/gridpoints follow the anchor (with some "delay").
      * Add this script to an empty game object and link it to the FormationGrid. The FormationAnchor will move towards the FormationGrid in the FormationGrid.Awake() method.
@@ -46,12 +45,16 @@ namespace com.t7t.formation
 
 #endif
 
+		private void Awake() {
+#if !T7T_ASTAR
+			agent = GetComponent<NavMeshAgent>();
+#endif
+		}
+
 		// Use this for initialization
 		private void Start() {
 #if T7T_ASTAR
             base.Start();
-#else
-			agent = GetComponent<NavMeshAgent>();
 #endif
 		}
 
