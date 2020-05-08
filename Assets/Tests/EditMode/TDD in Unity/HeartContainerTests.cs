@@ -52,16 +52,20 @@ public class HeartContainerTests
 
 public class HeartContainer
 {
-	private List<Heart> _list;
+	private readonly List<Heart> _list;
 
 	public HeartContainer(List<Heart> list) {
-		this._list = list;
+		_list = list;
 	}
 
 	public void Replenish(int numberOfHeartPieces) {
-
 		foreach(var heart in _list) {
-			heart.Replenish(numberOfHeartPieces);
+			if (numberOfHeartPieces > 0) {
+				var chargeCount = (Heart.HeartPiecesOfHeart - heart.CurrentNumberOfHeartPieces);
+				chargeCount = Mathf.Min(chargeCount, numberOfHeartPieces);
+				heart.Replenish(chargeCount);
+				numberOfHeartPieces -= chargeCount;
+			}
 		}
 	}
 }

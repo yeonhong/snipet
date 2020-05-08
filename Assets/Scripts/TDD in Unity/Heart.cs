@@ -5,11 +5,17 @@ namespace TDD_in_Unity
 {
 	public class Heart
 	{
-		private const float FillPerHeartPiece = 0.25f;
+		public const int HeartPiecesOfHeart = 4;
+		private const float FillPerHeartPiece = 1f / HeartPiecesOfHeart;
+
 		private Image _image;
 
 		public Heart(Image image) {
 			_image = image;
+		}
+
+		public int CurrentNumberOfHeartPieces {
+			get { return (int)(_image.fillAmount * HeartPiecesOfHeart); }
 		}
 
 		public void Deplate(int numberOfHeartPieces) {

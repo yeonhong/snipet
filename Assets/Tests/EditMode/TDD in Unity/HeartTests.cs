@@ -15,6 +15,30 @@ public class Heart_Tests
 		_heart = new Heart(_image);
 	}
 
+	public class CurrentNumberOfHeart변수 : Heart_Tests
+	{
+		[Test]
+		public void _0_CurrentNumberOfHeart가_0이다() {
+			_image.fillAmount = 0f;
+
+			Assert.AreEqual(0, _heart.CurrentNumberOfHeartPieces);
+		}
+
+		[Test]
+		public void _0_이미지가25프로차면_CurrentNumberOfHeart가_1이다() {
+			_image.fillAmount = 0.25f;
+
+			Assert.AreEqual(1, _heart.CurrentNumberOfHeartPieces);
+		}
+
+		[Test]
+		public void _0_이미지가75프로차면_CurrentNumberOfHeart가_3이다() {
+			_image.fillAmount = 0.75f;
+
+			Assert.AreEqual(3, _heart.CurrentNumberOfHeartPieces);
+		}
+	}
+
 	public class Replenish함수 : Heart_Tests
 	{
 		[Test]
