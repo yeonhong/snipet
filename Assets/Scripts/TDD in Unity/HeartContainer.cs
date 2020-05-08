@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+using System;
 
 namespace TDD_in_Unity
 {
@@ -12,6 +14,11 @@ namespace TDD_in_Unity
 		}
 
 		public void Replenish(int numberOfHeartPieces) {
+
+			if(numberOfHeartPieces < 0) {
+				throw new ArgumentOutOfRangeException(nameof(numberOfHeartPieces));
+			}
+
 			foreach (var heart in _list) {
 				if (numberOfHeartPieces > 0) {
 					var chargeCount = (Heart.HeartPiecesOfHeart - heart.CurrentNumberOfHeartPieces);

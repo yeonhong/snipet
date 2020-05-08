@@ -47,5 +47,10 @@ public class HeartContainerTests
 			Assert.AreEqual(0.25f, _image_first.fillAmount);
 			Assert.AreEqual(0f, _image_last.fillAmount);
 		}
+
+		[Test]
+		public void _2_음수를_넣었을때_ArgumentOutOfRangeException_발생() {
+			Assert.Throws<ArgumentOutOfRangeException>(() => _heartContainer.Replenish(-1));
+		}
 	}
 }
