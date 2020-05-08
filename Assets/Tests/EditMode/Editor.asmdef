@@ -1,11 +1,13 @@
 {
-    "name": "TestSuite",
+    "name": "EditMode",
     "references": [
-        "_GameProgrammingPattern",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "_GameProgrammingPattern"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
