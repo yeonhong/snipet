@@ -30,12 +30,12 @@ namespace Tests.ProgrammingPattern
 
 			public override void OnEnter()
 			{
-				Debug.Log("<< endter " + ID);
+				// Debug.Log("<< endter " + ID);
 			}
 
 			public override void OnLeave()
 			{
-				Debug.Log(">> leave " + ID);
+				// Debug.Log(">> leave " + ID);
 			}
 		}
 	}
