@@ -16,5 +16,9 @@ namespace TDD_in_Unity.Infrastructure
 		public static HeartBuilder Heart() {
 			return new HeartBuilder();
 		}
+
+		public static HeartContainerBuilder HeartContainer() {
+			return new HeartContainerBuilder();
+		}
 	}
 }

@@ -5,15 +5,15 @@ namespace TDD_in_Unity.Infrastructure
 {
 	public class ImageBuilder : TestDataBuilder<Image>
 	{
-		private int _fillAmount;
+		private float _fillAmount;
 
-		public ImageBuilder(int fillAmount) {
+		public ImageBuilder(float fillAmount) {
 			_fillAmount = fillAmount;
 		}
 
 		public ImageBuilder() : this(0) { }
 
-		public ImageBuilder WithFillAmount(int fillAmount) {
+		public ImageBuilder WithFillAmount(float fillAmount) {
 			_fillAmount = fillAmount;
 			return this;
 		}

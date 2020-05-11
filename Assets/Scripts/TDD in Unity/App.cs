@@ -1,24 +1,29 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace TDD_in_Unity
 {
 	public class App : MonoBehaviour
 	{
-		[SerializeField] private Image _image = null;
-		private Heart _heart = null;
+		[SerializeField] private List<Image> _images = null;
+		[SerializeField] private int _count = 1;
+
+		private HeartContainer _heartContainer = null;
 
 		private void Start() {
-			_heart = new Heart(_image);
+			_heartContainer = new HeartContainer(
+				_images.Select(image => new Heart(image)).ToList());
 		}
 
 		private void Update() {
 			if (Input.GetKeyDown(KeyCode.UpArrow)) {
-				_heart.Replenish(1);
+				_heartContainer.Replenish(_count);
 			}
 
 			if (Input.GetKeyDown(KeyCode.DownArrow)) {
-				_heart.Deplate(1);
+				_heartContainer.Deplete(_count);
 			}
 		}
 	}

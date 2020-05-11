@@ -56,5 +56,53 @@ public class HeartContainerTests
 		public void _2_음수를_넣었을때_ArgumentOutOfRangeException_발생() {
 			Assert.Throws<ArgumentOutOfRangeException>(() => _heartContainer.Replenish(-1));
 		}
+
+		[Test]
+		public void _3_다중_하트에_적용할수_있는지() {
+			((HeartContainer) A.HeartContainer().With(
+				A.Heart().With(An.Image().WithFillAmount(0.75f)), 
+				A.Heart().With(_image_last))).Replenish(2);
+
+			Assert.AreEqual(0.25f, _image_last.fillAmount);
+		}
+	}
+
+	public class Deplete함수
+	{
+		Image target;
+
+		[SetUp]
+		public void BeforeTests() {
+			target = An.Image().WithFillAmount(1f);
+		}
+
+		[Test]
+		public void _0_100퍼센트일때_0을깎았을때() {
+			((HeartContainer)A.HeartContainer().With(
+					A.Heart().With(target))).
+					Deplete(0);
+
+			Assert.AreEqual(1f, target.fillAmount);
+		}
+
+		[Test]
+		public void _1_100퍼센트일때_1을깎으면_75퍼센트가_된다() {
+			((HeartContainer)A.HeartContainer().With(
+				A.Heart().With(target))).
+				Deplete(1);
+
+			Assert.AreEqual(0.75f, target.fillAmount);
+		}
+
+		[Test]
+		public void _1_두개의_하트에서_깍을때의_테스트() {
+			((HeartContainer)A.HeartContainer().With(
+				A.Heart().With(target), 
+				A.Heart().With(An.Image().WithFillAmount(0.25f)
+				))).
+				Deplete(2);
+
+			Assert.AreEqual(0.75f, target.fillAmount);
+		}
 	}
 }

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using System;
+using System.Linq;
 
 namespace TDD_in_Unity
 {
@@ -13,19 +14,37 @@ namespace TDD_in_Unity
 			_list = list;
 		}
 
-		public void Replenish(int numberOfHeartPieces) {
+		public void Replenish(int heartPieces) {
 
-			if(numberOfHeartPieces < 0) {
-				throw new ArgumentOutOfRangeException(nameof(numberOfHeartPieces));
+			if(heartPieces < 0) {
+				throw new ArgumentOutOfRangeException(nameof(heartPieces));
 			}
 
 			foreach (var heart in _list) {
-				if (numberOfHeartPieces > 0) {
-					var chargeCount = (Heart.HeartPiecesOfHeart - heart.CurrentNumberOfHeartPieces);
-					chargeCount = Mathf.Min(chargeCount, numberOfHeartPieces);
-					heart.Replenish(chargeCount);
-					numberOfHeartPieces -= chargeCount;
+				if (heartPieces > 0) {
+					var toReplenish = Mathf.Min(heart.EmptyHeartPieces, heartPieces);
+					heartPieces -= toReplenish;
+					heart.Replenish(toReplenish);
 				}
+				else
+					break;
+			}
+		}
+
+		public void Deplete(int heartPieces) {
+
+			if (heartPieces < 0) {
+				throw new ArgumentOutOfRangeException(nameof(heartPieces));
+			}
+
+			foreach (var heart in _list.AsEnumerable().Reverse()) {
+				if (heartPieces > 0) {
+					var toDeplate = Mathf.Min(heart.FilledHeartPieces, heartPieces);
+					heartPieces -= toDeplate;
+					heart.Deplate(toDeplate);
+				}
+				else
+					break;
 			}
 		}
 	}
