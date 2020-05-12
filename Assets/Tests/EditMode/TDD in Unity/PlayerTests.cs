@@ -89,4 +89,66 @@ public class PlayerTests
 			Assert.AreEqual(0, player.CurrentHealth);
 		}
 	}
+
+	public class Heal이벤트
+	{
+		[Test]
+		public void 힐이벤트발생() {
+			var amount = -1;
+			var player = new Player(1);
+
+			player.Healed += (sender, args) => {
+				amount = args.Amount;
+			};
+
+			player.Heal(0);
+
+			Assert.AreEqual(0, amount);
+		}
+
+		[Test]
+		public void 오버힐링은_무시한다() {
+			var amount = -1;
+			var player = new Player(1,1);
+
+			player.Healed += (sender, args) => {
+				amount = args.Amount;
+			};
+
+			player.Heal(100);
+
+			Assert.AreEqual(0, amount);
+		}
+	}
+
+	public class Damage이벤트
+	{
+		[Test]
+		public void 데미지이벤트발생() {
+			var amount = -1;
+			var player = new Player(1);
+
+			player.Damaged += (sender, args) => {
+				amount = args.Amount;
+			};
+
+			player.Damage(1);
+
+			Assert.AreEqual(1, amount);
+		}
+
+		[Test]
+		public void 오버데미지는_무시한다() {
+			var amount = -1;
+			var player = new Player(0, 1);
+
+			player.Damaged += (sender, args) => {
+				amount = args.Amount;
+			};
+
+			player.Damage(100);
+
+			Assert.AreEqual(0, amount);
+		}
+	}
 }
