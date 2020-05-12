@@ -1,16 +1,16 @@
 ﻿using NUnit.Framework;
-using ProgrammingPattern;
 using UnityEngine;
 
-namespace Tests.ProgrammingPattern
+namespace ProgrammingPattern.Tests
 {
-	public class SingleMono : Singleton<SingleMono>
-	{
-		public int SingleValue = 0;
-	}
-
+	[TestFixture]
 	public class SingletonPatternTest
 	{
+		public class SingleMono : Singleton<SingleMono>
+		{
+			public int SingleValue = 0;
+		}
+
 		[SetUp]
 		public void Setup() {
 			SingleMono.Instance.SingleValue = 100;
@@ -24,7 +24,7 @@ namespace Tests.ProgrammingPattern
 
 		[Test]
 		public void 싱글턴오브젝트찾기() {
-			var singletonObject = GameObject.Find("Tests.ProgrammingPattern.SingleMono");
+			var singletonObject = GameObject.Find("ProgrammingPattern.Tests.SingletonPatternTest+SingleMono");
 			Assert.IsNotNull(singletonObject);
 		}
 

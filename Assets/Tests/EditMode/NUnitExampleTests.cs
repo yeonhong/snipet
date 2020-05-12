@@ -2,7 +2,7 @@
 using System;
 
 // namespace로 메뉴에서 계층구조로 분류가 가능하다
-namespace Editor
+namespace NUnitExample
 {
 	/*
 	 * 테스트 명명법 정리
@@ -34,11 +34,13 @@ namespace Editor
 
 		[Test]
 		[Ignore("무시합니다.")]
+		[Category("NUnit Example")]
 		public void 테스트_무시() {
 			Assert.IsTrue(true);
 		}
 
 		[Test]
+		[Category("NUnit Example")]
 		public void Throws테스트() {
 			Assert.Throws<ArgumentOutOfRangeException>(() => {
 				throw new ArgumentOutOfRangeException();
@@ -49,6 +51,7 @@ namespace Editor
 		public class InnerTests
 		{
 			[Test]
+			[Category("NUnit Example")]
 			public void InnerTest클래스로_관련성을_보여줄수있다() {
 				// NunitExampleTests+InnerTests
 				Assert.IsTrue(true);

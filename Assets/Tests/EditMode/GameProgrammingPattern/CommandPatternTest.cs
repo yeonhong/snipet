@@ -1,34 +1,33 @@
 ﻿using NUnit.Framework;
-using ProgrammingPattern;
 using UnityEngine;
 
-namespace Tests.ProgrammingPattern
+namespace ProgrammingPattern.Tests
 {
-	public class Actor
-	{
-		public Vector3 position = Vector3.zero;
-	}
-
-	public class JumpCommand : Command<Actor>
-	{
-		public override void Excute(Actor actor) {
-			actor.position.y--;
-		}
-	}
-
-	public class MoveCommand : Command<Actor>
-	{
-		public override void Excute(Actor actor) {
-			actor.position.y--;
-			actor.position.x--;
-		}
-	}
-
+	[TestFixture]
 	public class CommandPatternTest
 	{
-		Actor testActor = null;
-		JumpCommand jumpCommand = null;
+		public class Actor
+		{
+			public Vector3 position = Vector3.zero;
+		}
 
+		public class JumpCommand : Command<Actor>
+		{
+			public override void Excute(Actor actor) {
+				actor.position.y--;
+			}
+		}
+
+		public class MoveCommand : Command<Actor>
+		{
+			public override void Excute(Actor actor) {
+				actor.position.y--;
+				actor.position.x--;
+			}
+		}
+
+		private Actor testActor = null;
+		private JumpCommand jumpCommand = null;
 
 		[SetUp]
 		public void Setup() {
@@ -39,7 +38,7 @@ namespace Tests.ProgrammingPattern
 		[Test]
 		public void ChangeStateTest() {
 			var expectVal = testActor.position.y - 1;
-			
+
 			jumpCommand.Excute(testActor);
 
 			Assert.AreEqual(expectVal, testActor.position.y);

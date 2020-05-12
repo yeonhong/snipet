@@ -1,58 +1,19 @@
 ﻿using NUnit.Framework;
-using ProgrammingPattern;
-using UnityEngine;
 
-namespace Tests.ProgrammingPattern
+namespace ProgrammingPattern.Tests
 {
-	public class ExampleStateManager : FiniteStateMachine<ExampleStateManager>
-	{
-		public enum eState : int
-		{
-			None = 0,
-			Test1 = 1,
-		}
-
-		public eState State { get { return (eState)Current.GetID(); } }
-
-		protected override void Initialize() {
-			AddState(new ExampleState(eState.None));
-			AddState(new ExampleState(eState.Test1));
-		}
-
-		public void ChangeState(eState nextID)
-		{
-			base.ChangeState((int)nextID);
-		}
-
-		public class ExampleState : FiniteState
-		{
-			public ExampleState(eState id) : base((int)id) {	}
-
-			public override void OnEnter()
-			{
-				// Debug.Log("<< endter " + ID);
-			}
-
-			public override void OnLeave()
-			{
-				// Debug.Log(">> leave " + ID);
-			}
-		}
-	}
-
+	[TestFixture]
 	public class FiniteStateMachineTest
 	{
-		ExampleStateManager stateManager = null;
+		private ExampleStateManager stateManager = null;
 
 		[SetUp]
-		public void Setup()
-		{
+		public void Setup() {
 			stateManager = new ExampleStateManager();
 		}
 
 		[Test]
-		public void ChangeStateTest()
-		{
+		public void ChangeStateTest() {
 			stateManager.ChangeState(ExampleStateManager.eState.Test1);
 			Assert.IsTrue(stateManager.State == ExampleStateManager.eState.Test1);
 		}
@@ -67,5 +28,38 @@ namespace Tests.ProgrammingPattern
 		//    // Use yield to skip a frame.
 		//    yield return null;
 		//}
+
+		public class ExampleStateManager : FiniteStateMachine<ExampleStateManager>
+		{
+			public enum eState : int
+			{
+				None = 0,
+				Test1 = 1,
+			}
+
+			public eState State => (eState)Current.GetID();
+
+			protected override void Initialize() {
+				AddState(new ExampleState(eState.None));
+				AddState(new ExampleState(eState.Test1));
+			}
+
+			public void ChangeState(eState nextID) {
+				base.ChangeState((int)nextID);
+			}
+
+			public class ExampleState : FiniteState
+			{
+				public ExampleState(eState id) : base((int)id) { }
+
+				public override void OnEnter() {
+					// Debug.Log("<< endter " + ID);
+				}
+
+				public override void OnLeave() {
+					// Debug.Log(">> leave " + ID);
+				}
+			}
+		}
 	}
 }
