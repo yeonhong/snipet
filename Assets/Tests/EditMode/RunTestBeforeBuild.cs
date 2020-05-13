@@ -1,9 +1,10 @@
 ﻿using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using UnityEngine;
 using UnityEditor.TestTools.TestRunner.Api;
-using NUnit.Framework;
-using UnityEngine.TestTools;
+using UnityEngine;
+
+// 아래 링크 참고.
+// https://www.youtube.com/watch?v=wTiF2D0_vKA
 
 public class ResultCollector : ICallbacks
 {
@@ -37,8 +38,9 @@ public class RunTestsBeforeBuild : IPreprocessBuildWithReport
 			}}
 		});
 
-		if (result.Result.FailCount > 0)
+		if (result.Result.FailCount > 0) {
 			throw new BuildFailedException($"{result.Result.FailCount} tests failed");
+		}
 
 		Debug.Log($"tests passed: {result.Result.PassCount}");
 	}
