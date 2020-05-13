@@ -16,6 +16,16 @@ namespace NUnitExample
 	[TestFixture]
 	public class NUnitExampleTests
 	{
+		[OneTimeSetUp]
+		public void BeforeTestsOnce() {
+			// 모든 테스트 시작 전에 한번만 실행.
+		}
+
+		[OneTimeTearDown]
+		public void AfterTestsOnce() {
+			// 모든 테스트 끝난 후에 한번만 실행.
+		}
+
 		[SetUp]
 		public void BeforeTests() {
 			// 각 테스트 전에 실행.
