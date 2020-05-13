@@ -5,6 +5,7 @@ using UnityEditor;
 using com.t7t.utilities;
 using UnityEngine.AI;
 
+#if UNITY_EDITOR
 namespace com.t7t.formation
 {
     [CustomEditor(typeof(FormationManager))]
@@ -202,3 +203,4 @@ namespace com.t7t.formation
 
     }
 }
+#endif
