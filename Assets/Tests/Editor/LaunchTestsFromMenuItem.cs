@@ -15,9 +15,16 @@ public class RunTestsFromMenu : ScriptableObject, ICallbacks
 	}
 	private void StartTestRun() {
 		hideFlags = HideFlags.HideAndDontSave;
-		CreateInstance<TestRunnerApi>().Execute(new ExecutionSettings {
-			filters = new[] { new Filter { categoryNames = new[] { "UsefulTests" } } }
-		});
+		
+		// ExecutionSetting.
+		// https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/reference-filter.html
+		var filter = new Filter() {
+			testMode = TestMode.PlayMode
+			//testMode = TestMode.EditMode
+			//https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/extension-run-tests.html
+		};
+
+		CreateInstance<TestRunnerApi>().Execute(new ExecutionSettings(filter));
 	}
 	public void OnEnable() { CreateInstance<TestRunnerApi>().RegisterCallbacks(this); }
 	public void OnDisable() { CreateInstance<TestRunnerApi>().UnregisterCallbacks(this); }
