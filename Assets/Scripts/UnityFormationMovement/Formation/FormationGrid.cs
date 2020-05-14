@@ -30,10 +30,6 @@ namespace com.t7t.formation
      * 
      */
 
-
-	// TODO LIST:
-	//              Does anchor need rigidbody? Probably not.
-
 	public enum GridTypes { None, Box9, RightFlank5, LeftFlank5, Wedge9, Line8, StaggeredLine8, Column10, Custom, Function };
 	// Custom = load from file
 	// Function is function based on id
@@ -141,7 +137,7 @@ namespace com.t7t.formation
 			toolbox.allFormations.Add(this);
 
 			if (anchor == null) {
-				// TODO: alternatively create the anchor here (from prefab?)
+				// alternatively create the anchor here (from prefab?)
 				Debug.LogError("FormationGrid.Awake(): anchor not assigned");
 				return;
 			}
@@ -223,7 +219,7 @@ namespace com.t7t.formation
 					ChangeAnimationStateOnGridObjects(true);
 
 					state = newstate;
-					
+
 					if (audioSource) {
 						audioSource.mute = false;
 					}
@@ -403,7 +399,8 @@ namespace com.t7t.formation
 
 			if (state == FormationStates.Move) {
 
-				if ((oldPosition - anchorPosition).sqrMagnitude > 0.001f * 0.001f)  // TODO: potentially we can do this by checking if target has been reached
+				if ((oldPosition - anchorPosition).sqrMagnitude > 0.001f * 0.001f)
+// potentially we can do this by checking if target has been reached
 {
 					positionDirty = true;
 				}
@@ -424,7 +421,7 @@ namespace com.t7t.formation
 				}
 
 				// Rotate the units at grid points to align with anchor rotation:
-				// TODO: can we check when not to run this by means of "fully rotated" units?
+				// can we check when not to run this by means of "fully rotated" units?
 				if (formationAnchor != null) {
 					// Vector3 velocity = formationAnchor.GetVelocity();
 
@@ -469,7 +466,7 @@ namespace com.t7t.formation
 
 				// Now move the units (assigned to grid positions) towards their grid position:
 
-				// TODO: Add a check here to stop if all units have arrived.
+				// Add a check here to stop if all units have arrived.
 
 				if (formationAnchor != null) {
 					float endReachedDistance = formationAnchor.endReachedDistance;
@@ -709,7 +706,7 @@ namespace com.t7t.formation
 		}
 
 		// Setup the grid based on static offsets contained in the function.
-		// TODO: replace these static definitions by JSON files loaded from the project.
+		// replace these static definitions by JSON files loaded from the project.
 		public bool SetupGrid(GridTypes gridtype) {
 			gridPoints.Clear();
 
@@ -870,13 +867,9 @@ namespace com.t7t.formation
 			}
 		}
 
-
-
 		public bool AddObjectsToGrid(List<GameObject> list) {
-			// TODO
 			return true;
 		}
-
 
 		// Assign the objects in a list to the FormationGridPoint(s) in the gridPoints list
 		public bool AssignObjectsToGrid(List<GameObject> list) {
