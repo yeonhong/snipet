@@ -3,9 +3,11 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
-// 아래 링크 참고.
-// https://www.youtube.com/watch?v=wTiF2D0_vKA
-
+/*
+ * 아래 링크 참고. 
+ * https://www.youtube.com/watch?v=wTiF2D0_vKA
+ * https://unity.com/how-to/unity-test-framework-video-game-development
+ */
 public class ResultCollector : ICallbacks
 {
 	public ITestResultAdaptor Result { get; private set; }
@@ -33,7 +35,7 @@ public class RunTestsBeforeBuild : IPreprocessBuildWithReport
 
 		api.Execute(new ExecutionSettings {
 			runSynchronously = true,
-			filters = new[]{ new Filter{
+			filters = new[]{ new Filter {
 				testMode = TestMode.EditMode
 			}}
 		});
