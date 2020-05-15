@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TDD in Unity.unity
     guid: 22e9d1bc75ef3454b8d3b832a18509f1
+  - enabled: 1
+    path: Assets/Tests/Scenes/TestScene.unity
+    guid: 0fccb8322342124408aad945df3cd905
   m_configObjects: {}

@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 namespace ValidationTests
 {
-	// todo : 프리팹의 정합성 테스트 작성.
 	[TestFixture]
 	[TestFixtureSource(typeof(PrefabProvider))]
 	[Category("Validation")]
