@@ -21,9 +21,31 @@ public class ResultCollector : ICallbacks
 	public void TestStarted(ITestAdaptor test) { }
 }
 
-public class RunTestsBeforeBuild : IPreprocessBuildWithReport
+public class RunTestsBeforeBuild : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 {
 	public int callbackOrder => 0;
+
+	public void OnPostprocessBuild(BuildReport report) {
+		//Debug.Log("run postbuild editmode tests");
+
+		//var result = new ResultCollector();
+
+		//var api = ScriptableObject.CreateInstance<TestRunnerApi>();
+		//api.RegisterCallbacks(result);
+
+		//api.Execute(new ExecutionSettings {
+		//	runSynchronously = true,
+		//	filters = new[]{ new Filter {
+		//		testMode = TestMode.EditMode
+		//	}}
+		//});
+
+		//if (result.Result.FailCount > 0) {
+		//	throw new BuildFailedException($"{result.Result.FailCount} tests failed");
+		//}
+
+		//Debug.Log($"tests passed: {result.Result.PassCount}");
+	}
 
 	public void OnPreprocessBuild(BuildReport report) {
 		Debug.Log("run prebuild editmode tests");
