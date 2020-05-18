@@ -3,13 +3,14 @@ using System;
 using System.Collections;
 using UnityEngine;
 using RangeAttribute = NUnit.Framework.RangeAttribute;
+using NSubstitute;
 
 // namespace로 메뉴에서 계층구조로 분류가 가능하다
 namespace NUnitExample
 {
 	/*
 	 * 테스트 명명법 정리
-	 * 상위 클래스틑 테스트할 대상 클래스이름 + Tests (ex. PlayerTests)
+	 * 상위 클래스는 테스트할 대상 클래스이름 + Tests (ex. PlayerTests)
 	 * inner클래스의 경우는 대상 클래스의 함수나 프로퍼티를 테스트 (ex. CurrentHpPropertyTests)
 	 * 테스트의 경우 [시나리오]_[기대값] (ex. 체력이상으로회복할때_최대체력까지만회복된다)
 	 * 
@@ -20,7 +21,7 @@ namespace NUnitExample
 	 */
 
 	[TestFixture]
-	[TestFixtureSource(typeof(FixtureArgs))]
+	[TestFixtureSource(typeof(TestSourceProvider))]
 	public class NUnitExampleTests
 	{
 		public NUnitExampleTests(string arg, int val) {
@@ -98,12 +99,11 @@ namespace NUnitExample
 	}
 
 	// https://github.com/nunit/docs/wiki/TestFixtureSource-Attribute 참고.
-	class FixtureArgs : IEnumerable
+	class TestSourceProvider : IEnumerable
 	{
 		public IEnumerator GetEnumerator() {
 			yield return new object[] { "Arg1", 1 };
 			yield return new object[] { "Arg2", 2 };
 		}
 	}
-
 }
