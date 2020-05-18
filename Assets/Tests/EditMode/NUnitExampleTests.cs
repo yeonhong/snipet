@@ -1,9 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections;
-using UnityEngine;
 using RangeAttribute = NUnit.Framework.RangeAttribute;
-using NSubstitute;
 
 // namespace로 메뉴에서 계층구조로 분류가 가능하다
 namespace NUnitExample
@@ -99,7 +97,7 @@ namespace NUnitExample
 	}
 
 	// https://github.com/nunit/docs/wiki/TestFixtureSource-Attribute 참고.
-	class TestSourceProvider : IEnumerable
+	internal class TestSourceProvider : IEnumerable
 	{
 		public IEnumerator GetEnumerator() {
 			yield return new object[] { "Arg1", 1 };
