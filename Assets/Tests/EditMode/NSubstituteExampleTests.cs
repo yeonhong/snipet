@@ -20,6 +20,33 @@ namespace NSubstituteExample
 		{
 			void Execute();
 			event EventHandler Executed;
+
+			void Run(IConnection connection);
+		}
+
+		public interface IConnection
+		{
+			Action SomethingHappened { get; set; }
+
+			void Open();
+			void Close();
+		}
+
+		public class Controller
+		{
+			private IConnection connection;
+			private ICommand command;
+
+			public Controller(IConnection connection, ICommand command) {
+				this.connection = connection;
+				this.command = command;
+			}
+
+			public void DoStuff() {
+				connection.Open();
+				command.Run(connection);
+				connection.Close();
+			}
 		}
 
 		public class SomethingThatNeedsACommand
@@ -282,6 +309,84 @@ namespace NSubstituteExample
 			Assert.AreEqual(123, revvedAt);
 		}
 
-		// https://nsubstitute.github.io/help/auto-and-recursive-mocks/
+		public interface ILookup
+		{
+			bool TryLookup(string v, out string value);
+		}
+
+		[Test]
+		public void Out_Ref_매개변수의_테스트() {
+			//Arrange
+			var lookup = Substitute.For<ILookup>();
+			lookup
+				.TryLookup("hello", out string val)
+				.Returns(ret => {
+					ret[1] = "world!";
+					return true;
+				});
+
+			//Act
+			var result = lookup.TryLookup("hello", out var value);
+
+			//Assert
+			Assert.True(result);
+			Assert.AreEqual(value, "world!");
+		}
+
+		[Test]
+		public void 호출순서를_테스트() {
+			// arrage
+			var connection = Substitute.For<IConnection>();
+			var command = Substitute.For<ICommand>();
+			var subject = new Controller(connection, command);
+
+			// act
+			subject.DoStuff();
+
+			// assert
+			Received.InOrder(() => {
+				connection.Open();
+				command.Run(connection);
+				connection.Close();
+			});
+		}
+
+		[Test]
+		public void SubscribeToEventBeforeOpeningConnection() {
+			var connection = Substitute.For<IConnection>();
+			connection.SomethingHappened += () => { int a = 1; };
+			connection.Open();
+
+			Received.InOrder(() => {
+				connection.SomethingHappened += Arg.Any<Action>();
+				connection.Open();
+			});
+		}
+
+		#region 부분적으로 모의동작처리
+
+		public class SummingReader
+		{
+			public virtual int Read(string path) {
+				var s = ReadFile(path);
+				return s.Split(',').Select(int.Parse).Sum();
+			}
+			public virtual string ReadFile(string path) { return "the result of reading the file here"; }
+		}
+
+		[Test]
+		public void ShouldSumAllNumbersInFile_부분모의동작테스트() {
+			var reader = Substitute.ForPartsOf<SummingReader>();
+			reader.ReadFile("foo.txt").Returns("1,2,3,4,5"); // CAUTION: real code warning!
+
+			var result = reader.Read("foo.txt");
+
+			Assert.That(result, Is.EqualTo(15));
+		}
+		#endregion
+
+
 	}
+
+
 }
