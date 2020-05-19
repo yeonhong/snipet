@@ -354,7 +354,7 @@ namespace NSubstituteExample
 		[Test]
 		public void SubscribeToEventBeforeOpeningConnection() {
 			var connection = Substitute.For<IConnection>();
-			connection.SomethingHappened += () => { int a = 1; };
+			connection.SomethingHappened += () => { };
 			connection.Open();
 
 			Received.InOrder(() => {

@@ -122,7 +122,7 @@ namespace com.t7t.formation
             // TODO: Added equivalent A* Code here
 #else
 			agent.destination = target.position;
-			agent.Resume();
+			agent.isStopped = false;
 #endif
 		}
 
@@ -139,7 +139,7 @@ namespace com.t7t.formation
 #if T7T_ASTAR
             // TODO: Added equivalent A* Code here
 #else
-			agent.Stop();
+			agent.isStopped = true;
 #endif
 		}
 

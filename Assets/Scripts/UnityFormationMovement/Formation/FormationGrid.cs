@@ -826,10 +826,10 @@ namespace com.t7t.formation
 					if (nma) {
 						if (state) {
 							nma.destination = fgp.GetPosition();
-							nma.Resume();
+							nma.isStopped = false;
 						}
 						else {
-							nma.Stop();
+							nma.isStopped = true;
 							Rigidbody rigidbody = fgp.GetRigidbody();
 							if (rigidbody) {
 								rigidbody.velocity = Vector3.zero;
