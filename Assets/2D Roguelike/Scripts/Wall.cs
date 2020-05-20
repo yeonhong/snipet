@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using NUnit.Framework;
+using UnityEngine;
 
-namespace Completed
+namespace Roguelike2D
 {
 	public class Wall : MonoBehaviour
 	{

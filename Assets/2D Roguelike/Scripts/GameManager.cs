@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Completed
+namespace Roguelike2D
 {
 	using System.Collections.Generic;       //Allows us to use Lists. 
 	using UnityEngine.UI;                   //Allows us to use UI.

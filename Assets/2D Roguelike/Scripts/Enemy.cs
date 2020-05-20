@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Completed
+namespace Roguelike2D
 {
 	//Enemy inherits from MovingObject, our base class for objects that can move, Player also inherits from this.
 	public class Enemy : MovingObject

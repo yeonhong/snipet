@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Completed
+namespace Roguelike2D
 {
 	public class SoundManager : MonoBehaviour
 	{

@@ -3,7 +3,7 @@ using System.Collections.Generic;       //Allows us to use Lists.
 using UnityEngine;
 using Random = UnityEngine.Random;      //Tells Random to use the Unity Engine random number generator.
 
-namespace Completed
+namespace Roguelike2D
 {
 	public class BoardManager : MonoBehaviour
 	{
