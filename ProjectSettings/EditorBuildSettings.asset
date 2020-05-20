@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/2D Roguelike/Game.unity
+    guid: 72d362146ea8845739db4749fdcbe96d
+  - enabled: 0
     path: Assets/Scenes/TDD in Unity.unity
     guid: 22e9d1bc75ef3454b8d3b832a18509f1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Tests/Scenes/TestScene.unity
     guid: 0fccb8322342124408aad945df3cd905
   m_configObjects: {}
