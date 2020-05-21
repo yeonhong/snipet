@@ -13,10 +13,10 @@ namespace ValidationTests
 			_prefab = prefab;
 		}
 
-		[Test]
-		public void 기본컴포넌트_체크() {
-			Assert.IsNotNull(_prefab.GetComponent<SpriteRenderer>());
-			Assert.IsNotNull(_prefab.GetComponent<BoxCollider2D>());
+		[TestCase(typeof(SpriteRenderer))]
+		[TestCase(typeof(BoxCollider2D))]
+		public void 기본컴포넌트_체크(System.Type type) {
+			Assert.IsNotNull(_prefab.GetComponent(type));
 		}
 
 		[Test]

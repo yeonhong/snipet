@@ -10,17 +10,16 @@ namespace ValidationTests
 	public class WallPrefabValidationTests
 	{
 		private readonly GameObject _prefab;
-		private readonly Transform _transform;
 		public WallPrefabValidationTests(GameObject prefab) {
 			_prefab = prefab;
-			_transform = prefab.transform;
+			
 		}
 
-		[Test]
-		public void 기본컴포넌트_체크() {
-			Assert.IsNotNull(_prefab.GetComponent<SpriteRenderer>());
-			Assert.IsNotNull(_prefab.GetComponent<BoxCollider2D>());
-			Assert.IsNotNull(_prefab.GetComponent<Wall>());
+		[TestCase(typeof(SpriteRenderer))]
+		[TestCase(typeof(BoxCollider2D))]
+		[TestCase(typeof(Wall))]
+		public void 기본컴포넌트_체크(System.Type type) {
+			Assert.IsNotNull(_prefab.GetComponent(type));
 		}
 
 		[Test]
@@ -37,11 +36,18 @@ namespace ValidationTests
 
 		[Test]
 		public void Wall컴포넌트에_MissingLink가_있는지_체크() {
-			var wall = _prefab.GetComponent<Wall>();
-			Assert.IsNotNull(wall.chopSound1);
-			Assert.IsNotNull(wall.chopSound2);
-			Assert.IsNotNull(wall.dmgSprite);
+			Wall wall = GetWallComponent();
+			Assert.That(wall.chopSound1 != null && wall.chopSound2 != null && wall.dmgSprite != null);
+		}
+
+		[Test]
+		public void Wall의_체력이_0_이상인가() {
+			var wall = GetWallComponent();
 			Assert.IsTrue(wall.hp > 0);
+		}
+
+		private Wall GetWallComponent() {
+			return _prefab.GetComponent<Wall>();
 		}
 	}
 
