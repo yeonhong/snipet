@@ -1,4 +1,7 @@
-﻿using UnityEditor;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
@@ -38,6 +41,29 @@ public class RunTestsFromMenu : ScriptableObject, ICallbacks
 	}
 
 	public void RunFinished(ITestResultAdaptor result) {
+		if (!result.HasChildren) {
+			EditorUtility.DisplayDialog("알림", "Validation 테스트가 없습니다.", "OK");
+		}
+		else if (result.FailCount == 0) {
+			EditorUtility.DisplayDialog("알림", "테스트가 모두 성공했습니다.", "OK");
+		}
+		else {
+			IEnumerable<string> GetFailedTestNames(ITestResultAdaptor test) {
+				if (test.HasChildren) {
+					return test.Children.SelectMany(GetFailedTestNames);
+				}
+
+				return test.TestStatus == TestStatus.Failed ? new[] { test.Name } : Array.Empty<string>();
+			}
+
+			string failedTestNames = string.Join("\n", GetFailedTestNames(result));
+			EditorUtility.DisplayDialog("알림",
+				$"실패하였습니다. ({result.FailCount} 개)\n" +
+				$"{failedTestNames}",
+				"OK");
+			EditorApplication.ExecuteMenuItem("Window/General/Test Runner");
+		}
+
 		DestroyImmediate(this);
 	}
 }
