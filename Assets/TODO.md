@@ -7,3 +7,8 @@
         * https://www.youtube.com/watch?v=Lx61ZEKEvnQ
 [] Scriptable Build Pipeline
 [] android logcat
+
+* Unity ML
+https://www.youtube.com/watch?v=gYwWolRFt98
+https://unity3d.com/machine-learning/
+https://github.com/Unity-Technologies/ml-agents
