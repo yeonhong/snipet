@@ -1,62 +1,98 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Roguelike2D
 {
+	public class PlayerModel
+	{
+		public PlayerModel(int initFood) {
+			Food = initFood;
+		}
+
+		public int Food { get; private set; }
+		public bool IsFoodEmpty => Food <= 0;
+
+		public void LoseFood(int amount) {
+			if (amount < 0) {
+				throw new ArgumentOutOfRangeException($"{nameof(amount)}의 값은 음수가 되면 안된다.");
+			}
+
+			Food = Math.Max(Food - amount, 0);
+		}
+
+		public void GainFood(int amount) {
+			if (amount < 0) {
+				throw new ArgumentOutOfRangeException($"{nameof(amount)}의 값은 음수가 되면 안된다.");
+			}
+
+			Food += amount;
+		}
+	}
+
 	public class Player : MovingObject
 	{
-		// todo : 각 프로퍼티를 고유의 동작으로 분해하기
+		[SerializeField] private float restartLevelDelay = 1f;
+		[SerializeField] private int pointsPerFood = 10;
+		[SerializeField] private int pointsPerSoda = 20;
+		[SerializeField] private int wallDamage = 1;
 
-		public float restartLevelDelay = 1f;
-		public int pointsPerFood = 10;
-		public int pointsPerSoda = 20;
-		public int wallDamage = 1;
-		public Text foodText;
-		public AudioClip moveSound1;
-		public AudioClip moveSound2;
-		public AudioClip eatSound1; 
-		public AudioClip eatSound2;
-		public AudioClip drinkSound1;
-		public AudioClip drinkSound2;
-		public AudioClip gameOverSound;
+		[SerializeField] private Text foodText = null;
 
-		private Animator animator;
-		private int food;
+		public AudioClip moveSound1 = null;
+		public AudioClip moveSound2 = null;
+		public AudioClip eatSound1 = null;
+		public AudioClip eatSound2 = null;
+		public AudioClip drinkSound1 = null;
+		public AudioClip drinkSound2 = null;
+		public AudioClip gameOverSound = null;
+
+		private Animator animator = null;
+		private PlayerModel _playerModel = null;
+		public IUnityService _unityService { private get; set; }
+		public IPlayerManage _playerManage { private get; set; }
+
+		protected override void Start() {
+			animator = GetComponent<Animator>();
+			if (_unityService == null) {
+				_unityService = new UnityService();
+			}
+			if (_playerManage == null) {
+				_playerManage = GameManager.instance;
+			}
+
+			_playerModel = new PlayerModel(_playerManage.GetPlayerFoodPoints());
+			UpdateFoodText();
+			base.Start();
+		}
+
+		private void OnDisable() {
+			_playerManage.SetPlayerFoodPoints(_playerModel.Food);
+		}
+
+		private void Update() {
+			if (!_playerManage.IsPlayersTurn()) {
+				return;
+			}
+
+			MoveController(out int horizontal, out int vertical);
+
+			if (horizontal != 0 || vertical != 0) {
+				AttemptMove<Wall>(horizontal, vertical);
+			}
+		}
 
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
 
-		protected override void Start() {
-			animator = GetComponent<Animator>();
-			food = GameManager.instance.playerFoodPoints;
-			foodText.text = "Food: " + food;
-			base.Start();
-		}
-
-		private void OnDisable() {
-			GameManager.instance.playerFoodPoints = food;
-		}
-
-		private void Update() {
-			if (!GameManager.instance.playersTurn) {
-				return;
-			}
-
-			int horizontal = 0;
-			int vertical = 0;
-
+		private void MoveController(out int horizontal, out int vertical) {
 			// todo : 플랫폼에 따라 조작계가 변할 수 있도록 리펙토링.
 #if UNITY_STANDALONE || UNITY_WEBPLAYER
 
-			//Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
-			horizontal = (int)(Input.GetAxisRaw("Horizontal"));
-
-			//Get input from the input manager, round it to an integer and store in vertical to set y axis move direction
-			vertical = (int)(Input.GetAxisRaw("Vertical"));
-
-			//Check if moving horizontally, if so set vertical to zero.
+			horizontal = (int)(_unityService.GetAxisRaw("Horizontal"));
+			vertical = (int)(_unityService.GetAxisRaw("Vertical"));
 			if (horizontal != 0) {
 				vertical = 0;
 			}
@@ -103,27 +139,22 @@ namespace Roguelike2D
 			}
 			
 #endif //End of mobile platform dependendent compilation section started above with #elif
-			
-			//Check if we have a non-zero value for horizontal or vertical
-			if (horizontal != 0 || vertical != 0) {
-				AttemptMove<Wall>(horizontal, vertical);
-			}
 		}
 
+		// 이동시도 (attempt : 시도하다)
 		protected override void AttemptMove<T>(int xDir, int yDir) {
-			food--;
-			foodText.text = "Food: " + food;
+			_playerModel.LoseFood(1);
+			UpdateFoodText();
 
 			base.AttemptMove<T>(xDir, yDir);
 
-			RaycastHit2D hit;
-
-			if (Move(xDir, yDir, out hit)) {
+			if (Move(xDir, yDir, out RaycastHit2D hit)) {
 				SoundManager.instance.RandomizeSfx(moveSound1, moveSound2);
 			}
 
 			CheckIfGameOver();
-			GameManager.instance.playersTurn = false;
+
+			_playerManage.EndPlayersTurn();
 		}
 
 		protected override void OnCantMove<T>(T component) {
@@ -138,14 +169,14 @@ namespace Roguelike2D
 				enabled = false;
 			}
 			else if (other.tag == "Food") {
-				food += pointsPerFood;
-				foodText.text = "+" + pointsPerFood + " Food: " + food;
+				_playerModel.GainFood(pointsPerFood);
+				UpdateFoodText(pointsPerFood);
 				SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
 				other.gameObject.SetActive(false);
 			}
 			else if (other.tag == "Soda") {
-				food += pointsPerSoda;
-				foodText.text = "+" + pointsPerSoda + " Food: " + food;
+				_playerModel.GainFood(pointsPerSoda);
+				UpdateFoodText(pointsPerSoda);
 				SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
 				other.gameObject.SetActive(false);
 			}
@@ -157,16 +188,30 @@ namespace Roguelike2D
 
 		public void LoseFood(int loss) {
 			animator.SetTrigger("playerHit");
-			food -= loss;
-			foodText.text = "-" + loss + " Food: " + food;
+			_playerModel.LoseFood(loss);
+			UpdateFoodText(-loss);
 			CheckIfGameOver();
 		}
 
 		private void CheckIfGameOver() {
-			if (food <= 0) {
+			if (_playerModel.IsFoodEmpty) {
 				SoundManager.instance.PlaySingle(gameOverSound);
 				SoundManager.instance.musicSource.Stop();
 				GameManager.instance.GameOver();
+			}
+		}
+
+		private void UpdateFoodText(int gainAmount = 0) {
+			if (foodText == null) return;
+
+			if (gainAmount == 0) {
+				foodText.text = "Food: " + _playerModel.Food;
+			}
+			else if (gainAmount > 0) {
+				foodText.text = "+" + gainAmount + " Food: " + _playerModel.Food;
+			}
+			else {
+				foodText.text = "-" + gainAmount + " Food: " + _playerModel.Food;
 			}
 		}
 	}

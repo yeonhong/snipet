@@ -33,6 +33,21 @@ namespace ValidationTests
 			var sprite = _prefab.GetComponent<SpriteRenderer>();
 			Assert.IsTrue(sprite.sortingLayerName.Equals("Units"));
 		}
+
+		[Test]
+		public void Play에_설정한_리소스_체크() {
+			var player = _prefab.GetComponent<Player>();
+
+			var isNotNull = player.moveSound1 != null &&
+							player.moveSound2 != null &&
+							player.eatSound1 != null &&
+							player.eatSound2 != null &&
+							player.drinkSound1 != null &&
+							player.drinkSound2 != null &&
+							player.gameOverSound != null;
+
+			Assert.That(isNotNull);
+		}
 	}
 
 	internal class PlayerPrefabProvider : PrefabProvider

@@ -7,7 +7,15 @@ namespace Roguelike2D
 	using System.Collections.Generic;       //Allows us to use Lists. 
 	using UnityEngine.UI;                   //Allows us to use UI.
 
-	public class GameManager : MonoBehaviour
+	public interface IPlayerManage
+	{
+		int GetPlayerFoodPoints();
+		void SetPlayerFoodPoints(int amount);
+		bool IsPlayersTurn();
+		void EndPlayersTurn();
+	}
+
+	public class GameManager : MonoBehaviour, IPlayerManage
 	{
 		public float levelStartDelay = 2f;                      //Time to wait before starting level, in seconds.
 		public float turnDelay = 0.1f;                          //Delay between each Player turn.
@@ -63,8 +71,10 @@ namespace Roguelike2D
 
 		//This is called each time a scene is loaded.
 		private static void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
-			instance.level++;
-			instance.InitGame();
+			if (instance != null) {
+				instance.level++;
+				instance.InitGame();
+			}
 		}
 
 
@@ -76,14 +86,18 @@ namespace Roguelike2D
 			//Get a reference to our image LevelImage by finding it by name.
 			levelImage = GameObject.Find("LevelImage");
 
-			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
-			levelText = GameObject.Find("LevelText").GetComponent<Text>();
+			//Get a reference to our text LevelText's text component by finding it by name and calling GetCompone
+
+			var levelTestObject = GameObject.Find("LevelText");
+			levelText = levelTestObject?.GetComponent<Text>();
 
 			//Set the text of levelText to the string "Day" and append the current level number.
-			levelText.text = "Day " + level;
+			if (levelText != null) {
+				levelText.text = "Day " + level;
+			}
 
 			//Set levelImage to active blocking player's view of the game board during setup.
-			levelImage.SetActive(true);
+			levelImage?.SetActive(true);
 
 			//Call the HideLevelImage function with a delay in seconds of levelStartDelay.
 			Invoke("HideLevelImage", levelStartDelay);
@@ -92,7 +106,7 @@ namespace Roguelike2D
 			enemies.Clear();
 
 			//Call the SetupScene function of the BoardManager script, pass it current level number.
-			boardScript.SetupScene(level);
+			boardScript?.SetupScene(level);
 
 		}
 
@@ -165,6 +179,22 @@ namespace Roguelike2D
 
 			//Enemies are done moving, set enemiesMoving to false.
 			enemiesMoving = false;
+		}
+
+		public int GetPlayerFoodPoints() {
+			return playerFoodPoints;
+		}
+
+		public void SetPlayerFoodPoints(int amount) {
+			playerFoodPoints = amount;
+		}
+
+		public bool IsPlayersTurn() {
+			return playersTurn;
+		}
+
+		public void EndPlayersTurn() {
+			playersTurn = false;
 		}
 	}
 }
