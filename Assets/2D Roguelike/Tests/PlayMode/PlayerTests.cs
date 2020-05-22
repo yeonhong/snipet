@@ -35,6 +35,7 @@ namespace Tests
 		}
 
 		[UnityTest]
+		[UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.WindowsPlayer)]
 		public IEnumerator Player는_Horizontal이_1일때_x가_양수쪽으로_이동한다() {
 			var service = Substitute.For<IUnityService>();
 			service.GetAxisRaw("Horizontal").Returns(1);
@@ -48,6 +49,7 @@ namespace Tests
 		}
 
 		[UnityTest]
+		[UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.WindowsPlayer)]
 		public IEnumerator Player는_Vertical이_1일때_y가_양수쪽으로_이동한다() {
 			var service = Substitute.For<IUnityService>();
 			service.GetAxisRaw("Vertical").Returns(1);
