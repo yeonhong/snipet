@@ -11,7 +11,9 @@ namespace Roguelike2D
 		private BoxCollider2D boxCollider;
 		private Rigidbody2D rb2D;
 		private float inverseMoveTime;
-		private bool isMoving;
+		private bool _isMoving;
+
+		public IUnityService _unityService { protected get; set; }
 
 		protected virtual void Start() {
 			boxCollider = GetComponent<BoxCollider2D>();
@@ -26,7 +28,7 @@ namespace Roguelike2D
 			hit = Physics2D.Linecast(start, end, blockingLayer);
 			boxCollider.enabled = true;
 
-			if (hit.transform == null && !isMoving) {
+			if (hit.transform == null && !_isMoving) {
 				StartCoroutine(SmoothMovement(end));
 				return true;
 			}
@@ -34,19 +36,22 @@ namespace Roguelike2D
 		}
 
 		protected IEnumerator SmoothMovement(Vector3 end) {
-			isMoving = true;
-			
+			_isMoving = true;
+
 			float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 
-			while (sqrRemainingDistance > float.Epsilon) {
-				Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end, inverseMoveTime * Time.deltaTime);
+			while (sqrRemainingDistance > Mathf.Epsilon) {
+				Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end,
+					inverseMoveTime * _unityService.GetDeltaTime());
+
 				rb2D.MovePosition(newPostion);
+
 				sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 				yield return null;
 			}
 
 			rb2D.MovePosition(end);
-			isMoving = false;
+			_isMoving = false;
 		}
 		
 		protected virtual void AttemptMove<T>(int xDir, int yDir) where T : Component {

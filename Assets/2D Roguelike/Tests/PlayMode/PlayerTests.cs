@@ -25,6 +25,8 @@ namespace Tests
 
 			var soundManager = Substitute.For<ISoundManager>();
 			player._soundManager = soundManager;
+
+			player.transform.position = Vector3.zero;
 		}
 
 		[TearDown]
@@ -33,14 +35,29 @@ namespace Tests
 		}
 
 		[UnityTest]
-		public IEnumerator Player는_Horizontal이_1일때_x가_1로_이동한다() {
+		public IEnumerator Player는_Horizontal이_1일때_x가_양수쪽으로_이동한다() {
 			var service = Substitute.For<IUnityService>();
 			service.GetAxisRaw("Horizontal").Returns(1);
+			service.GetDeltaTime().Returns(1f);
 			player._unityService = service;
 
-			yield return new WaitForSeconds(1f);
+			yield return new WaitForSeconds(.1f);
 
-			Assert.That(player.transform.position.x == 1f);
+			var posX = player.transform.position.x;
+			Assert.That(posX > 0f, $"{posX}");
+		}
+
+		[UnityTest]
+		public IEnumerator Player는_Vertical이_1일때_y가_양수쪽으로_이동한다() {
+			var service = Substitute.For<IUnityService>();
+			service.GetAxisRaw("Vertical").Returns(1);
+			service.GetDeltaTime().Returns(1f);
+			player._unityService = service;
+
+			yield return new WaitForSeconds(.1f);
+
+			var posY = player.transform.position.y;
+			Assert.That(posY > 0f, $"{posY}");
 		}
 	}
 }

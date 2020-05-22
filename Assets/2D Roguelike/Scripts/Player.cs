@@ -50,7 +50,6 @@ namespace Roguelike2D
 
 		private Animator animator = null;
 		private PlayerModel _playerModel = null;
-		public IUnityService _unityService { private get; set; }
 		public IPlayerManage _playerManager { private get; set; }
 		public ISoundManager _soundManager { private get; set; }
 
