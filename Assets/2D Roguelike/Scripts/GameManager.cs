@@ -13,6 +13,7 @@ namespace Roguelike2D
 		void SetPlayerFoodPoints(int amount);
 		bool IsPlayersTurn();
 		void EndPlayersTurn();
+		void GameOver();
 	}
 
 	public class GameManager : MonoBehaviour, IPlayerManage

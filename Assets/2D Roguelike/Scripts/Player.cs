@@ -51,28 +51,32 @@ namespace Roguelike2D
 		private Animator animator = null;
 		private PlayerModel _playerModel = null;
 		public IUnityService _unityService { private get; set; }
-		public IPlayerManage _playerManage { private get; set; }
+		public IPlayerManage _playerManager { private get; set; }
+		public ISoundManager _soundManager { private get; set; }
 
 		protected override void Start() {
 			animator = GetComponent<Animator>();
 			if (_unityService == null) {
 				_unityService = new UnityService();
 			}
-			if (_playerManage == null) {
-				_playerManage = GameManager.instance;
+			if (_playerManager == null) {
+				_playerManager = GameManager.instance;
+			}
+			if(_soundManager == null) {
+				_soundManager = SoundManager.instance;
 			}
 
-			_playerModel = new PlayerModel(_playerManage.GetPlayerFoodPoints());
+			_playerModel = new PlayerModel(_playerManager.GetPlayerFoodPoints());
 			UpdateFoodText();
 			base.Start();
 		}
 
 		private void OnDisable() {
-			_playerManage.SetPlayerFoodPoints(_playerModel.Food);
+			_playerManager.SetPlayerFoodPoints(_playerModel.Food);
 		}
 
 		private void Update() {
-			if (!_playerManage.IsPlayersTurn()) {
+			if (!_playerManager.IsPlayersTurn()) {
 				return;
 			}
 
@@ -149,12 +153,12 @@ namespace Roguelike2D
 			base.AttemptMove<T>(xDir, yDir);
 
 			if (Move(xDir, yDir, out RaycastHit2D hit)) {
-				SoundManager.instance.RandomizeSfx(moveSound1, moveSound2);
+				_soundManager.RandomizeSfx(moveSound1, moveSound2);
 			}
 
 			CheckIfGameOver();
 
-			_playerManage.EndPlayersTurn();
+			_playerManager.EndPlayersTurn();
 		}
 
 		protected override void OnCantMove<T>(T component) {
@@ -171,13 +175,13 @@ namespace Roguelike2D
 			else if (other.tag == "Food") {
 				_playerModel.GainFood(pointsPerFood);
 				UpdateFoodText(pointsPerFood);
-				SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
+				_soundManager.RandomizeSfx(eatSound1, eatSound2);
 				other.gameObject.SetActive(false);
 			}
 			else if (other.tag == "Soda") {
 				_playerModel.GainFood(pointsPerSoda);
 				UpdateFoodText(pointsPerSoda);
-				SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
+				_soundManager.RandomizeSfx(drinkSound1, drinkSound2);
 				other.gameObject.SetActive(false);
 			}
 		}
@@ -195,9 +199,9 @@ namespace Roguelike2D
 
 		private void CheckIfGameOver() {
 			if (_playerModel.IsFoodEmpty) {
-				SoundManager.instance.PlaySingle(gameOverSound);
-				SoundManager.instance.musicSource.Stop();
-				GameManager.instance.GameOver();
+				_soundManager.PlaySingle(gameOverSound);
+				_soundManager.StopMusic();
+				_playerManager.GameOver();
 			}
 		}
 
