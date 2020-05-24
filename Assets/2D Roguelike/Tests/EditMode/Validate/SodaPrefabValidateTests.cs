@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Roguelike2D;
 using UnityEngine;
 
 namespace ValidationTests
@@ -15,6 +16,7 @@ namespace ValidationTests
 
 		[TestCase(typeof(SpriteRenderer))]
 		[TestCase(typeof(BoxCollider2D))]
+		[TestCase(typeof(FoodObject))]
 		public void 기본컴포넌트_체크(System.Type type) {
 			Assert.IsNotNull(_prefab.GetComponent(type));
 		}

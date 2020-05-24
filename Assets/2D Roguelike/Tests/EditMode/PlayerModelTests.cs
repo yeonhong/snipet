@@ -7,11 +7,6 @@ namespace UnitTests
 	[TestFixture]
 	public class PlayerModelTests
 	{
-		/*
-			todo : 각 프로퍼티를 고유의 동작으로 분해하기
-			wall의 공격관련
-		*/
-
 		[Test]
 		public void PlayerModel의생성() {
 			var model = new PlayerModel(1);

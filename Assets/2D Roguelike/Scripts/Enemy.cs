@@ -79,7 +79,7 @@ namespace Roguelike2D
 			Player hitPlayer = component as Player;
 
 			//Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
-			hitPlayer.LoseFood(playerDamage);
+			hitPlayer.OnDamage(playerDamage);
 
 			//Set the attack trigger of animator to trigger Enemy attack animation.
 			animator.SetTrigger("enemyAttack");

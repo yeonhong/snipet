@@ -34,8 +34,6 @@ namespace Roguelike2D
 	public class Player : MovingObject
 	{
 		[SerializeField] private float restartLevelDelay = 1f;
-		[SerializeField] private int pointsPerFood = 10;
-		[SerializeField] private int pointsPerSoda = 20;
 		[SerializeField] private int wallDamage = 1;
 
 		[SerializeField] private Text foodText = null;
@@ -161,9 +159,11 @@ namespace Roguelike2D
 		}
 
 		protected override void OnCantMove<T>(T component) {
-			Wall hitWall = component as Wall;
-			hitWall.DamageWall(wallDamage);
-			animator.SetTrigger("playerChop");
+			var hitWall = component as Wall;
+			if (hitWall != null) {
+				hitWall.DamageWall(wallDamage);
+				animator.SetTrigger("playerChop");
+			}
 		}
 
 		private void OnTriggerEnter2D(Collider2D other) {
@@ -172,27 +172,27 @@ namespace Roguelike2D
 				enabled = false;
 			}
 			else if (other.tag == "Food") {
-				_playerModel.GainFood(pointsPerFood);
-				UpdateFoodText(pointsPerFood);
-				_soundManager.RandomizeSfx(eatSound1, eatSound2);
-				other.gameObject.SetActive(false);
+				EatFood(other.GetComponent<FoodObject>());
+			} else if (other.tag == "Soda") {
+				EatFood(other.GetComponent<FoodObject>());
 			}
-			else if (other.tag == "Soda") {
-				_playerModel.GainFood(pointsPerSoda);
-				UpdateFoodText(pointsPerSoda);
-				_soundManager.RandomizeSfx(drinkSound1, drinkSound2);
-				other.gameObject.SetActive(false);
-			}
+		}
+
+		private void EatFood(FoodObject food) {
+			_playerModel.GainFood(food.Points);
+			UpdateFoodText(food.Points);
+			food.Consume();
 		}
 
 		private void Restart() {
 			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
 		}
 
-		public void LoseFood(int loss) {
+		public void OnDamage(int damage) {
 			animator.SetTrigger("playerHit");
-			_playerModel.LoseFood(loss);
-			UpdateFoodText(-loss);
+
+			_playerModel.LoseFood(damage);
+			UpdateFoodText(-damage);
 			CheckIfGameOver();
 		}
 
