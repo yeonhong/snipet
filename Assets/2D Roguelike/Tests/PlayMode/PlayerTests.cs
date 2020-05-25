@@ -42,10 +42,12 @@ namespace Tests
 			service.GetDeltaTime().Returns(1f);
 			player._unityService = service;
 
+			Vector2 start = player.transform.position;
+			Vector2 end = start + new Vector2(service.GetAxisRaw("Horizontal"), 0f);
 			yield return new WaitForSeconds(.1f);
 
-			var posX = player.transform.position.x;
-			Assert.That(posX > 0f, $"{posX}");
+			Vector2 finish = player.transform.position;
+			Assert.That(MovingObject.AlmostClosed(end, finish), $"{end} != {finish}");
 		}
 
 		[UnityTest]
@@ -56,10 +58,12 @@ namespace Tests
 			service.GetDeltaTime().Returns(1f);
 			player._unityService = service;
 
+			Vector2 start = player.transform.position;
+			Vector2 end = start + new Vector2(0f, service.GetAxisRaw("Vertical"));
 			yield return new WaitForSeconds(.1f);
 
-			var posY = player.transform.position.y;
-			Assert.That(posY > 0f, $"{posY}");
+			Vector2 finish = player.transform.position;
+			Assert.That(MovingObject.AlmostClosed(end, finish), $"{end} != {finish}");
 		}
 	}
 }

@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Roguelike2D
 {
-	// todo : 이동할 수 있는 오브젝트의 부모클래스.
 	public abstract class MovingObject : MonoBehaviour
 	{
 		public float moveTime = 0.1f;
@@ -14,6 +13,10 @@ namespace Roguelike2D
 		private bool _isMoving;
 
 		public IUnityService _unityService { protected get; set; }
+
+		public static bool AlmostClosed(Vector2 v1, Vector2 v2) {
+			return Vector2.SqrMagnitude(v1 - v2) < 0.001f;
+		}
 
 		protected virtual void Start() {
 			boxCollider = GetComponent<BoxCollider2D>();
@@ -39,13 +42,11 @@ namespace Roguelike2D
 			_isMoving = true;
 
 			float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
-
 			while (sqrRemainingDistance > Mathf.Epsilon) {
 				Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end,
 					inverseMoveTime * _unityService.GetDeltaTime());
 
 				rb2D.MovePosition(newPostion);
-
 				sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 				yield return null;
 			}
