@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,15 +10,11 @@ namespace Roguelike2D
 		[SerializeField] private float restartLevelDelay = 1f;
 		[SerializeField] private int wallDamage = 1;
 
+		// todo : 옵저버방식으로 리펙토링.
 		[SerializeField] private Text foodText = null;
 
 		public AudioClip moveSound1 = null;
 		public AudioClip moveSound2 = null;
-		public AudioClip eatSound1 = null;
-		public AudioClip eatSound2 = null;
-		public AudioClip drinkSound1 = null;
-		public AudioClip drinkSound2 = null;
-		public AudioClip gameOverSound = null;
 
 		private Animator animator = null;
 		private PlayerModel _playerModel = null;
@@ -34,10 +30,10 @@ namespace Roguelike2D
 			if (_playerManager == null) {
 				_playerManager = GameManager.instance;
 			}
-			if(_soundManager == null) {
+			if (_soundManager == null) {
 				_soundManager = SoundManager.instance;
 			}
-			if(_inputContoller == null) {
+			if (_inputContoller == null) {
 #if UNITY_STANDALONE || UNITY_WEBPLAYER
 				_inputContoller = new InputController_Standalone(_unityService);
 #elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
@@ -54,6 +50,7 @@ namespace Roguelike2D
 			_playerManager.SetPlayerFoodPoints(_playerModel.Food);
 		}
 
+		#region 이동관련
 		private void Update() {
 			if (!_playerManager.IsPlayersTurn()) {
 				return;
@@ -89,15 +86,14 @@ namespace Roguelike2D
 				animator.SetTrigger("playerChop");
 			}
 		}
+		#endregion
 
 		private void OnTriggerEnter2D(Collider2D other) {
 			if (other.tag == "Exit") {
-				Invoke("Restart", restartLevelDelay);
+				StartCoroutine(CoRestart());
 				enabled = false;
 			}
-			else if (other.tag == "Food") {
-				EatFood(other.GetComponent<FoodObject>());
-			} else if (other.tag == "Soda") {
+			else if (other.tag == "Food" || other.tag == "Soda") {
 				EatFood(other.GetComponent<FoodObject>());
 			}
 		}
@@ -108,8 +104,15 @@ namespace Roguelike2D
 			food.Consume();
 		}
 
-		private void Restart() {
+		private IEnumerator CoRestart() {
+			yield return new WaitForSeconds(restartLevelDelay);
 			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+		}
+
+		private void CheckIfGameOver() {
+			if (_playerModel.IsFoodEmpty) {
+				_playerManager.GameOver();
+			}
 		}
 
 		public void OnDamage(int damage) {
@@ -120,16 +123,10 @@ namespace Roguelike2D
 			CheckIfGameOver();
 		}
 
-		private void CheckIfGameOver() {
-			if (_playerModel.IsFoodEmpty) {
-				_soundManager.PlaySingle(gameOverSound);
-				_soundManager.StopMusic();
-				_playerManager.GameOver();
-			}
-		}
-
 		private void UpdateFoodText(int gainAmount = 0) {
-			if (foodText == null) return;
+			if (foodText == null) {
+				return;
+			}
 
 			if (gainAmount == 0) {
 				foodText.text = "Food: " + _playerModel.Food;

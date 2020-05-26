@@ -24,6 +24,7 @@ namespace Roguelike2D
 		public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
 		[HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
 
+		[SerializeField] AudioClip gameOverSound = null;
 
 		private Text levelText;                                 //Text to display current level number.
 		private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
@@ -143,6 +144,10 @@ namespace Roguelike2D
 
 		//GameOver is called when the player reaches 0 food points
 		public void GameOver() {
+
+			SoundManager.instance.PlaySingle(gameOverSound);
+			SoundManager.instance.StopMusic();
+
 			//Set levelText to display number of levels passed and game over message
 			levelText.text = "After " + level + " days, you starved.";
 
