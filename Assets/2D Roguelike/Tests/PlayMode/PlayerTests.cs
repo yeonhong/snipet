@@ -23,8 +23,7 @@ namespace Tests
 			playerManage.GetPlayerFoodPoints().Returns(100);
 			player._playerManager = playerManage;
 
-			var soundManager = Substitute.For<ISoundManager>();
-			player._soundManager = soundManager;
+			player._soundManager = Substitute.For<ISoundManager>();
 
 			player.transform.position = Vector3.zero;
 		}
@@ -41,6 +40,7 @@ namespace Tests
 			service.GetAxisRaw("Horizontal").Returns(1);
 			service.GetDeltaTime().Returns(1f);
 			player._unityService = service;
+			player._inputContoller = new InputController_Standalone(service);
 
 			Vector2 start = player.transform.position;
 			Vector2 end = start + new Vector2(service.GetAxisRaw("Horizontal"), 0f);
@@ -57,6 +57,7 @@ namespace Tests
 			service.GetAxisRaw("Vertical").Returns(1);
 			service.GetDeltaTime().Returns(1f);
 			player._unityService = service;
+			player._inputContoller = new InputController_Standalone(service);
 
 			Vector2 start = player.transform.position;
 			Vector2 end = start + new Vector2(0f, service.GetAxisRaw("Vertical"));
