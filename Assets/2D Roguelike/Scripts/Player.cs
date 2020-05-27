@@ -10,9 +10,7 @@ namespace Roguelike2D
 		[SerializeField] private float restartLevelDelay = 1f;
 		[SerializeField] private int wallDamage = 1;
 		[SerializeField] private FoodTextDisplayer _foodTextDisplayer = null;
-
-		public AudioClip moveSound1 = null;
-		public AudioClip moveSound2 = null;
+		public AudioClip[] moveSounds = null;
 
 		private Animator animator = null;
 		private PlayerModel _playerModel = null;
@@ -57,30 +55,28 @@ namespace Roguelike2D
 			_inputContoller.MoveController(out int horizontal, out int vertical);
 
 			if (horizontal != 0 || vertical != 0) {
-				AttemptMove<Wall>(horizontal, vertical);
+				AttemptMove(horizontal, vertical);
 			}
 		}
 
-		// 이동시도 (attempt : 시도하다)
-		protected override void AttemptMove<T>(int xDir, int yDir) {
-			_playerModel.LoseFood(1);
-			_foodTextDisplayer?.UpdateFoodAmount(_playerModel.Food);
+		private void AttemptMove(int xDir, int yDir) {
+			var isMoved = base.AttemptMove<Wall>(xDir, yDir);
 
-			base.AttemptMove<T>(xDir, yDir);
-
-			if (Move(xDir, yDir, out RaycastHit2D hit)) {
-				_soundManager.RandomizeSfx(moveSound1, moveSound2);
+			if (isMoved) {
+				_soundManager.RandomizeSfx(moveSounds);
 			}
-
-			CheckIfGameOver();
 
 			_playerManager.EndPlayersTurn();
+
+			_playerModel.LoseFood(1);
+			_foodTextDisplayer?.UpdateFoodAmount(_playerModel.Food);
+			CheckIfGameOver();
 		}
 
-		protected override void OnCantMove<T>(T component) {
-			var hitWall = component as Wall;
-			if (hitWall != null) {
-				hitWall.DamageWall(wallDamage);
+		protected override void OnBumped<T>(T component) {
+			var bumpedWall = component as Wall;
+			if (bumpedWall != null) {
+				bumpedWall.DamageWall(wallDamage);
 				animator.SetTrigger("playerChop");
 			}
 		}

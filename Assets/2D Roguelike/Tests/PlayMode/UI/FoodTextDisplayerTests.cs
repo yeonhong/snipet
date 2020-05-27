@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 namespace Tests.UI
 {
-	// todo : food text displayer 테스트 작성.
     public class FoodTextDisplayerTests
     {
 		GameObject _foodTextObject;

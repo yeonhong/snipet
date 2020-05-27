@@ -33,19 +33,21 @@ namespace Roguelike2D
 
 		//Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.
 		//See comments in MovingObject for more on how base AttemptMove function works.
-		protected override void AttemptMove<T>(int xDir, int yDir) {
+		protected override bool AttemptMove<T>(int xDir, int yDir) {
 			//Check if skipMove is true, if so set it to false and skip this turn.
 			if (skipMove) {
 				skipMove = false;
-				return;
+				return false;
 
 			}
 
 			//Call the AttemptMove function from MovingObject.
-			base.AttemptMove<T>(xDir, yDir);
+			var isMoved = base.AttemptMove<T>(xDir, yDir);
 
 			//Now that Enemy has moved, set skipMove to true to skip next move.
 			skipMove = true;
+
+			return isMoved;
 		}
 
 		//MoveEnemy is called by the GameManger each turn to tell each Enemy to try to move towards the player.
@@ -74,7 +76,7 @@ namespace Roguelike2D
 
 		//OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
 		//and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
-		protected override void OnCantMove<T>(T component) {
+		protected override void OnBumped<T>(T component) {
 			//Declare hitPlayer and set it to equal the encountered component.
 			Player hitPlayer = component as Player;
 

@@ -13,7 +13,7 @@ namespace Tests
     {
 		class MovingObject : Roguelike2D.MovingObject
 		{
-			protected override void OnCantMove<T>(T component) {
+			protected override void OnBumped<T>(T component) {
 			}
 
 			public void Move(int xDir, int yDir) {
