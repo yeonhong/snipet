@@ -62,13 +62,13 @@ namespace Tests
 			}
 		}
 
-		// todo : 모바일 플랫폼용 이동 테스트 추가하기
 		[TestFixture]
-		//[UnityPlatform(RuntimePlatform.Android, RuntimePlatform.OSXPlayer)]
+		[UnityPlatform(RuntimePlatform.WindowsEditor, 
+			RuntimePlatform.Android, RuntimePlatform.OSXPlayer)]
 		public class MobilePlatform
 		{
 			[UnityTest]
-			public IEnumerator 기본생성() {
+			public IEnumerator _0_기본생성() {
 				var dummy = Substitute.For<IUnityService>();
 				var moveContoller = new InputController_Mobile(dummy);
 
@@ -76,6 +76,67 @@ namespace Tests
 
 				moveContoller.MoveController(out int horizontal, out int vertical);
 				Assert.That(horizontal == 0 && vertical == 0);
+			}
+
+			[UnityTest]
+			public IEnumerator _1_이동입력의_크기가_1보다_작으면_동작하지않는다() {
+				var dummy = Substitute.For<IUnityService>();
+				dummy.IsMouseButtonDown().Returns(true);
+				dummy.GetMousePosition().Returns(Vector3.zero);
+				var moveContoller = new InputController_Mobile(dummy);
+				moveContoller.MoveController(out int h, out int v);
+
+				yield return null;
+				dummy.IsMouseButtonDown().Returns(false);
+				dummy.IsMouseButtonUp().Returns(true);
+				dummy.GetMousePosition().Returns(new Vector3(1, 0, 0));
+				moveContoller.MoveController(out int horizontal, out int vertical);
+
+				Assert.That(horizontal == 0 && vertical == 0, $"{horizontal} {vertical} 은 0이어야함");
+			}
+
+			[UnityTest]
+			[TestCase(2, 0, ExpectedResult = null)]
+			[TestCase(-2, 0, ExpectedResult = null)]
+			[TestCase(0, 2, ExpectedResult = null)]
+			[TestCase(0, -2, ExpectedResult = null)]
+			public IEnumerator _2_기본이동테스트(float endX, float endY) {
+				var dummy = Substitute.For<IUnityService>();
+				dummy.IsMouseButtonDown().Returns(true);
+				dummy.GetMousePosition().Returns(Vector3.zero);
+				var moveContoller = new InputController_Mobile(dummy);
+				moveContoller.MoveController(out int h, out int verticalv);
+
+				yield return null;
+				dummy.IsMouseButtonDown().Returns(false);
+				dummy.IsMouseButtonUp().Returns(true);
+				dummy.GetMousePosition().Returns(new Vector3(endX, endY, 0f));
+				moveContoller.MoveController(out int horizontal, out int vertical);
+
+				if(endX > 0 || endX < 0) {
+					Assert.AreEqual(Mathf.Abs(horizontal), 1);
+				} else {
+					Assert.AreEqual(Mathf.Abs(vertical), 1);
+				}
+			}
+
+			[UnityTest]
+			[TestCase(1, 1, ExpectedResult = null)]
+			[TestCase(-1, -1, ExpectedResult = null)]
+			public IEnumerator _3_X축_우선_값을반영합니다(float endX, float endY) {
+				var dummy = Substitute.For<IUnityService>();
+				dummy.IsMouseButtonDown().Returns(true);
+				dummy.GetMousePosition().Returns(Vector3.zero);
+				var moveContoller = new InputController_Mobile(dummy);
+				moveContoller.MoveController(out int h, out int verticalv);
+
+				yield return null;
+				dummy.IsMouseButtonDown().Returns(false);
+				dummy.IsMouseButtonUp().Returns(true);
+				dummy.GetMousePosition().Returns(new Vector3(endX, endY, 0f));
+				moveContoller.MoveController(out int horizontal, out int vertical);
+
+				Assert.AreEqual(Mathf.Abs(horizontal), 1);
 			}
 		}
 	}

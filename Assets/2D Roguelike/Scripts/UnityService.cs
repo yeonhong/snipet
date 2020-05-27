@@ -6,6 +6,9 @@ public interface IUnityService
 {
 	float GetAxisRaw(string v);
 	float GetDeltaTime();
+	Vector3 GetMousePosition();
+	bool IsMouseButtonDown();
+	bool IsMouseButtonUp();
 }
 
 public class UnityService : IUnityService
@@ -16,5 +19,17 @@ public class UnityService : IUnityService
 
 	public float GetDeltaTime() {
 		return Time.deltaTime;
+	}
+
+	public bool IsMouseButtonDown() {
+		return Input.GetMouseButtonDown(0);
+	}
+
+	public bool IsMouseButtonUp() {
+		return Input.GetMouseButtonUp(0);
+	}
+
+	public Vector3 GetMousePosition() {
+		return Input.mousePosition;
 	}
 }

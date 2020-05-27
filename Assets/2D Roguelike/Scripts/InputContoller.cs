@@ -27,7 +27,9 @@ namespace Roguelike2D
 
 	public class InputController_Mobile : InputContoller
 	{
-		private Vector2 touchOrigin = -Vector2.one;
+		private static readonly Vector2 emptyValue = -Vector2.one;
+		private Vector2 startPosition = emptyValue;
+		public float sensitivity { get; set; } = 1f;
 
 		public InputController_Mobile(IUnityService service) : base(service) { }
 
@@ -35,25 +37,24 @@ namespace Roguelike2D
 			horizontal = 0;
 			vertical = 0;
 
-			if (Input.touchCount > 0) {
-				Touch myTouch = Input.touches[0];
+			if (_unityService.IsMouseButtonDown()) {
+				startPosition = _unityService.GetMousePosition();
+			}
+			else if (_unityService.IsMouseButtonUp()) {
+				Vector2 endPosition = _unityService.GetMousePosition();
 
-				if (myTouch.phase == TouchPhase.Began) {
-					touchOrigin = myTouch.position;
-				}
-				else if (myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0) {
-					Vector2 touchEnd = myTouch.position;
-					float x = touchEnd.x - touchOrigin.x;
-					float y = touchEnd.y - touchOrigin.y;
-
-					touchOrigin.x = -1;
-					if (Mathf.Abs(x) > Mathf.Abs(y)) {
+				if ((endPosition - startPosition).magnitude > sensitivity) {
+					float x = endPosition.x - startPosition.x;
+					float y = endPosition.y - startPosition.y;
+					if (Mathf.Abs(x) >= Mathf.Abs(y)) {
 						horizontal = x > 0 ? 1 : -1;
 					}
 					else {
 						vertical = y > 0 ? 1 : -1;
 					}
 				}
+
+				startPosition = emptyValue;
 			}
 		}
 	}
