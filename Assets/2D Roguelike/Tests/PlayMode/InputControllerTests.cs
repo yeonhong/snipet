@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using NSubstitute;
+﻿using NSubstitute;
 using NUnit.Framework;
 using Roguelike2D;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Tests
 {
-    public class InputControllerTests
-    {
+	public class InputControllerTests
+	{
 		[TestFixture]
 		[UnityPlatform(RuntimePlatform.WindowsEditor, RuntimePlatform.WindowsPlayer)]
 		public class StandalonePlatform
@@ -63,7 +62,7 @@ namespace Tests
 		}
 
 		[TestFixture]
-		[UnityPlatform(RuntimePlatform.WindowsEditor, 
+		[UnityPlatform(RuntimePlatform.WindowsEditor,
 			RuntimePlatform.Android, RuntimePlatform.OSXPlayer)]
 		public class MobilePlatform
 		{
@@ -113,9 +112,10 @@ namespace Tests
 				dummy.GetMousePosition().Returns(new Vector3(endX, endY, 0f));
 				moveContoller.MoveController(out int horizontal, out int vertical);
 
-				if(endX > 0 || endX < 0) {
+				if (endX > 0 || endX < 0) {
 					Assert.AreEqual(Mathf.Abs(horizontal), 1);
-				} else {
+				}
+				else {
 					Assert.AreEqual(Mathf.Abs(vertical), 1);
 				}
 			}

@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 93537620}
   - component: {fileID: 93537622}
   - component: {fileID: 93537621}
+  - component: {fileID: 93537623}
   m_Layer: 5
   m_Name: FoodText
   m_TagString: Untagged
@@ -199,6 +200,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 93537619}
   m_CullTransparentMesh: 0
+--- !u!114 &93537623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93537619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 466d0d17f98be4f4da09bac14a831532, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &577730964
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,6 +321,10 @@ PrefabInstance:
       propertyPath: foodText
       value: 
       objectReference: {fileID: 93537621}
+    - target: {fileID: 11446652, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 3}
+      propertyPath: _foodTextDisplayer
+      value: 
+      objectReference: {fileID: 93537623}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 3}
 --- !u!1 &640480130

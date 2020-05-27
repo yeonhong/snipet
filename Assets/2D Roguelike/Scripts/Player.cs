@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using Roguelike2D.UI;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace Roguelike2D
 {
@@ -9,9 +9,7 @@ namespace Roguelike2D
 	{
 		[SerializeField] private float restartLevelDelay = 1f;
 		[SerializeField] private int wallDamage = 1;
-
-		// todo : 옵저버방식으로 리펙토링.
-		[SerializeField] private Text foodText = null;
+		[SerializeField] private FoodTextDisplayer _foodTextDisplayer = null;
 
 		public AudioClip moveSound1 = null;
 		public AudioClip moveSound2 = null;
@@ -42,7 +40,7 @@ namespace Roguelike2D
 			}
 
 			_playerModel = new PlayerModel(_playerManager.GetPlayerFoodPoints());
-			UpdateFoodText();
+			_foodTextDisplayer?.UpdateFoodAmount(_playerModel.Food);
 			base.Start();
 		}
 
@@ -66,7 +64,7 @@ namespace Roguelike2D
 		// 이동시도 (attempt : 시도하다)
 		protected override void AttemptMove<T>(int xDir, int yDir) {
 			_playerModel.LoseFood(1);
-			UpdateFoodText();
+			_foodTextDisplayer?.UpdateFoodAmount(_playerModel.Food);
 
 			base.AttemptMove<T>(xDir, yDir);
 
@@ -100,7 +98,7 @@ namespace Roguelike2D
 
 		private void EatFood(FoodObject food) {
 			_playerModel.GainFood(food.Points);
-			UpdateFoodText(food.Points);
+			_foodTextDisplayer?.GainFoodAmount(food.Points, _playerModel.Food);
 			food.Consume();
 		}
 
@@ -119,24 +117,9 @@ namespace Roguelike2D
 			animator.SetTrigger("playerHit");
 
 			_playerModel.LoseFood(damage);
-			UpdateFoodText(-damage);
+			_foodTextDisplayer?.LossFoodAmount(damage, _playerModel.Food);
+
 			CheckIfGameOver();
-		}
-
-		private void UpdateFoodText(int gainAmount = 0) {
-			if (foodText == null) {
-				return;
-			}
-
-			if (gainAmount == 0) {
-				foodText.text = "Food: " + _playerModel.Food;
-			}
-			else if (gainAmount > 0) {
-				foodText.text = "+" + gainAmount + " Food: " + _playerModel.Food;
-			}
-			else {
-				foodText.text = "-" + gainAmount + " Food: " + _playerModel.Food;
-			}
 		}
 	}
 }
