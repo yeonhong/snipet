@@ -20,15 +20,19 @@ namespace Roguelike2D
 
 		protected override void Start() {
 			animator = GetComponent<Animator>();
+
 			if (_unityService == null) {
 				_unityService = new UnityService();
 			}
+
 			if (_playerManager == null) {
 				_playerManager = GameManager.instance;
 			}
+
 			if (_soundManager == null) {
 				_soundManager = SoundManager.instance;
 			}
+
 			if (_inputContoller == null) {
 #if UNITY_STANDALONE || UNITY_WEBPLAYER
 				_inputContoller = new InputController_Standalone(_unityService);
