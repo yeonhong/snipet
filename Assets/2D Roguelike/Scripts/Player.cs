@@ -1,4 +1,5 @@
 ﻿using Roguelike2D.UI;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +10,6 @@ namespace Roguelike2D
 	{
 		[SerializeField] private float restartLevelDelay = 1f;
 		[SerializeField] private int wallDamage = 1;
-		[SerializeField] private FoodTextDisplayer _foodTextDisplayer = null;
 		public AudioClip[] moveSounds = null;
 
 		private Animator animator = null;
@@ -18,7 +18,46 @@ namespace Roguelike2D
 		public ISoundManager _soundManager { private get; set; }
 		public InputContoller _inputContoller { private get; set; }
 
+		#region food 재화 변경 이벤트
+		public event EventHandler<UpdateFoodCountArgs> UpdatedFood;
+		public event EventHandler<GainFoodArgs> GainFood;
+		public event EventHandler<LossFoodArgs> LossFood;
+
+		public class UpdateFoodCountArgs : EventArgs
+		{
+			public int Current { get; }
+
+			public UpdateFoodCountArgs(int current) {
+				Current = current;
+			}
+		}
+
+		public class GainFoodArgs : EventArgs
+		{
+			public int Current { get; }
+			public int Gain { get; }
+
+			public GainFoodArgs(int gain, int current) {
+				Current = current;
+				Gain = gain;
+			}
+		}
+
+		public class LossFoodArgs : EventArgs
+		{
+			public int Current { get; }
+			public int Loss { get; }
+
+			public LossFoodArgs(int loss, int current) {
+				Current = current;
+				Loss = loss;
+			}
+		}
+
+		#endregion
+
 		protected override void Start() {
+
 			animator = GetComponent<Animator>();
 
 			if (_unityService == null) {
@@ -42,7 +81,7 @@ namespace Roguelike2D
 			}
 
 			_playerModel = new PlayerModel(_playerManager.GetPlayerFoodPoints());
-			_foodTextDisplayer?.UpdateFoodAmount(_playerModel.Food);
+			UpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 			base.Start();
 		}
 
@@ -73,7 +112,7 @@ namespace Roguelike2D
 			_playerManager.EndPlayersTurn();
 
 			_playerModel.LoseFood(1);
-			_foodTextDisplayer?.UpdateFoodAmount(_playerModel.Food);
+			UpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 			CheckIfGameOver();
 		}
 
@@ -98,7 +137,8 @@ namespace Roguelike2D
 
 		private void EatFood(FoodObject food) {
 			_playerModel.GainFood(food.Points);
-			_foodTextDisplayer?.GainFoodAmount(food.Points, _playerModel.Food);
+			GainFood?.Invoke(this, new GainFoodArgs(food.Points, _playerModel.Food));
+
 			food.Consume();
 		}
 
@@ -117,7 +157,7 @@ namespace Roguelike2D
 			animator.SetTrigger("playerHit");
 
 			_playerModel.LoseFood(damage);
-			_foodTextDisplayer?.LossFoodAmount(damage, _playerModel.Food);
+			LossFood?.Invoke(this, new LossFoodArgs(damage, _playerModel.Food));
 
 			CheckIfGameOver();
 		}

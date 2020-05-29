@@ -17,6 +17,7 @@ namespace Roguelike2D
 
 	// todo : 재시작 기능을 추가한다
 	// todo : gamemanager 리펙토링
+	// todo : ui manager가 필요하다 - 중간 connect를 위해.
 
 	public class GameManager : MonoBehaviour, IPlayerManage
 	{
