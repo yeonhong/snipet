@@ -717,7 +717,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   restartButton: {fileID: 1690887175}
-  levelImageObject: {fileID: 1563974219}
+  levelImage: {fileID: 1563974219}
+  levelText: {fileID: 640480132}
   foodTextDisplayer: {fileID: 93537623}
 --- !u!1 &1563974219
 GameObject:

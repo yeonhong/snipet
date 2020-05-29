@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,13 +31,25 @@ namespace Roguelike2D
 		[HideInInspector] public bool playersTurn = true;
 		[SerializeField] private AudioClip gameOverSound = null;
 
-		private Text levelText;
-		private GameObject levelImage;
 		private BoardManager boardScript;
 		private int level = 1;
 		private List<Enemy> enemies;
 		private bool enemiesMoving;
 		private bool doingSetup = true;
+
+		#region EventHandler
+		public event EventHandler<GameDayArgs> OnGameInit;
+		public event EventHandler OnGameStart;
+		public event EventHandler<GameDayArgs> OnGameOver;
+
+		public class GameDayArgs : EventArgs
+		{
+			public int Day { get; }
+			public GameDayArgs(int day) {
+				Day = day;
+			}
+		} 
+		#endregion
 
 		private void Awake() {
 			if (instance == null) {
@@ -66,22 +79,16 @@ namespace Roguelike2D
 
 		private void InitGame() {
 			doingSetup = true;
-			levelImage = GameObject.Find("LevelImage");
-			var levelTestObject = GameObject.Find("LevelText");
-			levelText = levelTestObject?.GetComponent<Text>();
-
-			if (levelText != null) {
-				levelText.text = "Day " + level;
-			}
-
-			levelImage?.SetActive(true);
-			Invoke("HideLevelImage", levelStartDelay);
+			
 			enemies.Clear();
 			boardScript?.SetupScene(level);
+
+			OnGameInit?.Invoke(this, new GameDayArgs(level));
+			Invoke("HideLevelImage", levelStartDelay);
 		}
 
 		private void HideLevelImage() {
-			levelImage.SetActive(false);
+			OnGameStart?.Invoke(this, null);
 			doingSetup = false;
 		}
 
@@ -101,8 +108,8 @@ namespace Roguelike2D
 			SoundManager.instance.PlaySingle(gameOverSound);
 			SoundManager.instance.StopMusic();
 
-			levelText.text = "After " + level + " days, you starved.";
-			levelImage.SetActive(true);
+			OnGameOver?.Invoke(this, new GameDayArgs(level));
+
 			enabled = false;
 		}
 

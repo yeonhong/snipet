@@ -18,10 +18,10 @@ namespace Roguelike2D
 		public ISoundManager _soundManager { private get; set; }
 		public InputContoller _inputContoller { private get; set; }
 
-		#region food 재화 변경 이벤트
-		public event EventHandler<UpdateFoodCountArgs> UpdatedFood;
-		public event EventHandler<GainFoodArgs> GainFood;
-		public event EventHandler<LossFoodArgs> LossFood;
+		#region EventHandler
+		public event EventHandler<UpdateFoodCountArgs> OnUpdatedFood;
+		public event EventHandler<GainFoodArgs> OnGainFood;
+		public event EventHandler<LossFoodArgs> OnLossFood;
 
 		public class UpdateFoodCountArgs : EventArgs
 		{
@@ -81,7 +81,7 @@ namespace Roguelike2D
 			}
 
 			_playerModel = new PlayerModel(_playerManager.GetPlayerFoodPoints());
-			UpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
+			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 			base.Start();
 		}
 
@@ -112,7 +112,7 @@ namespace Roguelike2D
 			_playerManager.EndPlayersTurn();
 
 			_playerModel.LoseFood(1);
-			UpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
+			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 			CheckIfGameOver();
 		}
 
@@ -137,7 +137,7 @@ namespace Roguelike2D
 
 		private void EatFood(FoodObject food) {
 			_playerModel.GainFood(food.Points);
-			GainFood?.Invoke(this, new GainFoodArgs(food.Points, _playerModel.Food));
+			OnGainFood?.Invoke(this, new GainFoodArgs(food.Points, _playerModel.Food));
 
 			food.Consume();
 		}
@@ -157,7 +157,7 @@ namespace Roguelike2D
 			animator.SetTrigger("playerHit");
 
 			_playerModel.LoseFood(damage);
-			LossFood?.Invoke(this, new LossFoodArgs(damage, _playerModel.Food));
+			OnLossFood?.Invoke(this, new LossFoodArgs(damage, _playerModel.Food));
 
 			CheckIfGameOver();
 		}
