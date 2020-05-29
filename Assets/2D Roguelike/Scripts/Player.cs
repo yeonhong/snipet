@@ -14,7 +14,7 @@ namespace Roguelike2D
 
 		private Animator animator = null;
 		private PlayerModel _playerModel = null;
-		public IPlayerManage _playerManager { private get; set; }
+		public IPlayerManage _gameManager { private get; set; }
 		public ISoundManager _soundManager { private get; set; }
 		public InputContoller _inputContoller { private get; set; }
 
@@ -57,15 +57,12 @@ namespace Roguelike2D
 		#endregion
 
 		protected override void Start() {
+			base.Start();
 
 			animator = GetComponent<Animator>();
 
-			if (_unityService == null) {
-				_unityService = new UnityService();
-			}
-
-			if (_playerManager == null) {
-				_playerManager = GameManager.instance;
+			if (_gameManager == null) {
+				_gameManager = GameManager.instance;
 			}
 
 			if (_soundManager == null) {
@@ -80,18 +77,17 @@ namespace Roguelike2D
 #endif
 			}
 
-			_playerModel = new PlayerModel(_playerManager.GetPlayerFoodPoints());
+			_playerModel = new PlayerModel(_gameManager.GetPlayerFoodPoints());
 			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
-			base.Start();
 		}
 
 		private void OnDisable() {
-			_playerManager.SetPlayerFoodPoints(_playerModel.Food);
+			_gameManager.SetPlayerFoodPoints(_playerModel.Food);
 		}
 
 		#region 이동관련
 		private void Update() {
-			if (!_playerManager.IsPlayersTurn()) {
+			if (!_gameManager.IsPlayersTurn() || _isMoving) {
 				return;
 			}
 
@@ -102,18 +98,25 @@ namespace Roguelike2D
 			}
 		}
 
+		// todo : 플레이어가 이동하는 중인데 적이 이동한다?
 		private void AttemptMove(int xDir, int yDir) {
 			var isMoved = base.AttemptMove<Wall>(xDir, yDir);
-
-			if (isMoved) {
-				_soundManager.RandomizeSfx(moveSounds);
-			}
-
-			_playerManager.EndPlayersTurn();
 
 			_playerModel.LoseFood(1);
 			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 			CheckIfGameOver();
+
+			if (isMoved) {
+				_soundManager.RandomizeSfx(moveSounds);
+				Invoke("OnTurnEnd", moveTime);
+			} else {
+				OnTurnEnd();
+			}
+		}
+
+		private void OnTurnEnd() {
+			Debug.LogWarning("player move? " + _isMoving);
+			_gameManager.EndPlayersTurn();
 		}
 
 		protected override void OnBumped<T>(T component) {
@@ -149,7 +152,7 @@ namespace Roguelike2D
 
 		private void CheckIfGameOver() {
 			if (_playerModel.IsFoodEmpty) {
-				_playerManager.GameOver();
+				_gameManager.GameOver();
 			}
 		}
 

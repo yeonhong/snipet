@@ -21,7 +21,7 @@ namespace Tests
 			var playerManage = Substitute.For<IPlayerManage>();
 			playerManage.IsPlayersTurn().Returns(true);
 			playerManage.GetPlayerFoodPoints().Returns(100);
-			player._playerManager = playerManage;
+			player._gameManager = playerManage;
 
 			player._soundManager = Substitute.For<ISoundManager>();
 

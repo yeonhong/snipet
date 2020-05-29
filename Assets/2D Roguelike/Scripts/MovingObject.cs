@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Roguelike2D
 {
@@ -10,7 +11,7 @@ namespace Roguelike2D
 		private BoxCollider2D boxCollider;
 		private Rigidbody2D rb2D;
 		private float inverseMoveTime;
-		private bool _isMoving;
+		protected bool _isMoving;
 
 		public IUnityService _unityService { protected get; set; }
 
@@ -19,6 +20,10 @@ namespace Roguelike2D
 		}
 
 		protected virtual void Start() {
+			if (_unityService == null) {
+				_unityService = new UnityService();
+			}
+
 			boxCollider = GetComponent<BoxCollider2D>();
 			rb2D = GetComponent<Rigidbody2D>();
 			inverseMoveTime = 1f / moveTime;
@@ -40,21 +45,22 @@ namespace Roguelike2D
 
 		protected IEnumerator SmoothMovement(Vector3 end) {
 			_isMoving = true;
+			{
+				float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
+				while (sqrRemainingDistance > Mathf.Epsilon) {
+					Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end,
+						inverseMoveTime * _unityService.GetDeltaTime());
 
-			float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
-			while (sqrRemainingDistance > Mathf.Epsilon) {
-				Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end,
-					inverseMoveTime * _unityService.GetDeltaTime());
+					rb2D.MovePosition(newPostion);
+					sqrRemainingDistance = (transform.position - end).sqrMagnitude;
+					yield return null;
+				}
 
-				rb2D.MovePosition(newPostion);
-				sqrRemainingDistance = (transform.position - end).sqrMagnitude;
-				yield return null;
+				rb2D.MovePosition(end);
 			}
-
-			rb2D.MovePosition(end);
 			_isMoving = false;
 		}
-		
+
 		protected virtual bool AttemptMove<T>(int xDir, int yDir) where T : Component {
 			RaycastHit2D hit;
 			bool canMove = Move(xDir, yDir, out hit);

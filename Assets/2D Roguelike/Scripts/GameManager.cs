@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace Roguelike2D
 {
@@ -18,24 +17,21 @@ namespace Roguelike2D
 
 	// todo : 재시작 기능을 추가한다
 	// todo : gamemanager 리펙토링
-	// todo : ui manager가 필요하다 - 중간 connect를 위해.
+	// todo : enemymanager 추가
 
-	public class GameManager : MonoBehaviour, IPlayerManage
-	{
+	public class GameManager : MonoBehaviour, IPlayerManage {
 		public static GameManager instance = null;
 
 		public float levelStartDelay = 2f;
 		public float turnDelay = 0.1f;
 		public int playerFoodPoints = 100;
+		public bool playersTurn { get; private set; } = true;
 
-		[HideInInspector] public bool playersTurn = true;
 		[SerializeField] private AudioClip gameOverSound = null;
 
 		private BoardManager boardScript;
 		private int level = 1;
 		private List<Enemy> enemies;
-		private bool enemiesMoving;
-		private bool doingSetup = true;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -48,7 +44,7 @@ namespace Roguelike2D
 			public GameDayArgs(int day) {
 				Day = day;
 			}
-		} 
+		}
 		#endregion
 
 		private void Awake() {
@@ -78,8 +74,7 @@ namespace Roguelike2D
 		}
 
 		private void InitGame() {
-			doingSetup = true;
-			
+
 			enemies.Clear();
 			boardScript?.SetupScene(level);
 
@@ -89,19 +84,23 @@ namespace Roguelike2D
 
 		private void HideLevelImage() {
 			OnGameStart?.Invoke(this, null);
-			doingSetup = false;
-		}
-
-		private void Update() {
-			if (playersTurn || enemiesMoving || doingSetup) {
-				return;
-			}
-
-			StartCoroutine(MoveEnemies());
 		}
 
 		public void AddEnemyToList(Enemy script) {
 			enemies.Add(script);
+		}
+
+		private IEnumerator MoveEnemies() {
+			yield return new WaitForSeconds(turnDelay);
+
+			for (int i = 0; i < enemies.Count; i++) {
+				enemies[i].MoveEnemy();
+				yield return new WaitForSeconds(enemies[i].moveTime);
+			}
+
+			yield return new WaitForSeconds(turnDelay);
+
+			playersTurn = true;
 		}
 
 		public void GameOver() {
@@ -111,24 +110,6 @@ namespace Roguelike2D
 			OnGameOver?.Invoke(this, new GameDayArgs(level));
 
 			enabled = false;
-		}
-
-		private IEnumerator MoveEnemies() {
-			enemiesMoving = true;
-
-			yield return new WaitForSeconds(turnDelay);
-
-			if (enemies.Count == 0) {
-				yield return new WaitForSeconds(turnDelay);
-			}
-
-			for (int i = 0; i < enemies.Count; i++) {
-				enemies[i].MoveEnemy();
-				yield return new WaitForSeconds(enemies[i].moveTime);
-			}
-
-			playersTurn = true;
-			enemiesMoving = false;
 		}
 
 		public int GetPlayerFoodPoints() {
@@ -145,6 +126,8 @@ namespace Roguelike2D
 
 		public void EndPlayersTurn() {
 			playersTurn = false;
+
+			StartCoroutine(MoveEnemies());
 		}
 	}
 }
