@@ -31,7 +31,8 @@ namespace Roguelike2D
 
 		private BoardManager boardScript;
 		private int level = 1;
-		private List<Enemy> enemies;
+
+		private EnemyManager _enemyManager = null;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -56,10 +57,14 @@ namespace Roguelike2D
 			}
 
 			DontDestroyOnLoad(gameObject);
-			enemies = new List<Enemy>();
 			boardScript = GetComponent<BoardManager>();
+			if (_enemyManager == null) {
+				_enemyManager = new EnemyManager(turnDelay);
+				_enemyManager.OnEndEnemyTurn += OnEndEnemyTurn;
+			}
 			InitGame();
 		}
+
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void CallbackInitialization() {
@@ -75,7 +80,7 @@ namespace Roguelike2D
 
 		private void InitGame() {
 
-			enemies.Clear();
+			_enemyManager.Init();
 			boardScript?.SetupScene(level);
 
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
@@ -86,21 +91,8 @@ namespace Roguelike2D
 			OnGameStart?.Invoke(this, null);
 		}
 
-		public void AddEnemyToList(Enemy script) {
-			enemies.Add(script);
-		}
-
-		private IEnumerator MoveEnemies() {
-			yield return new WaitForSeconds(turnDelay);
-
-			for (int i = 0; i < enemies.Count; i++) {
-				enemies[i].MoveEnemy();
-				yield return new WaitForSeconds(enemies[i].moveTime);
-			}
-
-			yield return new WaitForSeconds(turnDelay);
-
-			playersTurn = true;
+		public void AddEnemyToList(Enemy enemy) {
+			_enemyManager.AddEnemyToList(enemy);
 		}
 
 		public void GameOver() {
@@ -126,8 +118,50 @@ namespace Roguelike2D
 
 		public void EndPlayersTurn() {
 			playersTurn = false;
+			StartCoroutine(_enemyManager.MoveEnemies());
+		}
 
-			StartCoroutine(MoveEnemies());
+		private void OnEndEnemyTurn(object sender, EventArgs e) {
+			playersTurn = true;
+		}
+
+	}
+
+	public class EnemyManager
+	{
+		public EnemyManager(float turnDelay) {
+			Enemies = new List<Enemy>();
+			_turnDelay = turnDelay;
+		}
+
+		public List<Enemy> Enemies { get; private set; }
+
+		private float _turnDelay;
+
+		public bool IsEnemyMoving { get; private set; }
+
+		public event EventHandler OnEndEnemyTurn;
+
+		public void Init() {
+			IsEnemyMoving = false;
+			Enemies.Clear();
+		}
+
+		public void AddEnemyToList(Enemy enemy) {
+			Enemies.Add(enemy);
+		}
+
+		public IEnumerator MoveEnemies() {
+			yield return new WaitForSeconds(_turnDelay);
+
+			for (int i = 0; i < Enemies.Count; i++) {
+				Enemies[i].MoveEnemy();
+				yield return new WaitForSeconds(Enemies[i].moveTime);
+			}
+
+			yield return new WaitForSeconds(_turnDelay);
+
+			OnEndEnemyTurn?.Invoke(this, null);
 		}
 	}
 }
