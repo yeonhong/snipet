@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,21 +15,20 @@ namespace Roguelike2D
 
 	// todo : 재시작 기능을 추가한다
 	// todo : gamemanager 리펙토링
-	// todo : enemymanager 추가
 
-	public class GameManager : MonoBehaviour, IPlayerManage {
+	public class GameManager : MonoBehaviour, IPlayerManage
+	{
 		public static GameManager instance = null;
 
 		public float levelStartDelay = 2f;
 		public float turnDelay = 0.1f;
 		public int playerFoodPoints = 100;
-		public bool playersTurn { get; private set; } = true;
+		public bool PlayersTurn { get; private set; } = true;
 
 		[SerializeField] private AudioClip gameOverSound = null;
 
 		private BoardManager boardScript;
 		private int level = 1;
-
 		private EnemyManager _enemyManager = null;
 
 		#region EventHandler
@@ -51,8 +48,7 @@ namespace Roguelike2D
 		private void Awake() {
 			if (instance == null) {
 				instance = this;
-			}
-			else if (instance != this) {
+			} else if (instance != this) {
 				Destroy(gameObject);
 			}
 
@@ -91,9 +87,7 @@ namespace Roguelike2D
 			OnGameStart?.Invoke(this, null);
 		}
 
-		public void AddEnemyToList(Enemy enemy) {
-			_enemyManager.AddEnemyToList(enemy);
-		}
+		public void AddEnemyToList(Enemy enemy) => _enemyManager.AddEnemy(enemy);
 
 		public void GameOver() {
 			SoundManager.instance.PlaySingle(gameOverSound);
@@ -113,56 +107,16 @@ namespace Roguelike2D
 		}
 
 		public bool IsPlayersTurn() {
-			return playersTurn;
+			return PlayersTurn;
 		}
 
 		public void EndPlayersTurn() {
-			playersTurn = false;
+			PlayersTurn = false;
 			StartCoroutine(_enemyManager.MoveEnemies());
 		}
 
 		private void OnEndEnemyTurn(object sender, EventArgs e) {
-			playersTurn = true;
-		}
-
-	}
-
-	public class EnemyManager
-	{
-		public EnemyManager(float turnDelay) {
-			Enemies = new List<Enemy>();
-			_turnDelay = turnDelay;
-		}
-
-		public List<Enemy> Enemies { get; private set; }
-
-		private float _turnDelay;
-
-		public bool IsEnemyMoving { get; private set; }
-
-		public event EventHandler OnEndEnemyTurn;
-
-		public void Init() {
-			IsEnemyMoving = false;
-			Enemies.Clear();
-		}
-
-		public void AddEnemyToList(Enemy enemy) {
-			Enemies.Add(enemy);
-		}
-
-		public IEnumerator MoveEnemies() {
-			yield return new WaitForSeconds(_turnDelay);
-
-			for (int i = 0; i < Enemies.Count; i++) {
-				Enemies[i].MoveEnemy();
-				yield return new WaitForSeconds(Enemies[i].moveTime);
-			}
-
-			yield return new WaitForSeconds(_turnDelay);
-
-			OnEndEnemyTurn?.Invoke(this, null);
+			PlayersTurn = true;
 		}
 	}
 }
-
