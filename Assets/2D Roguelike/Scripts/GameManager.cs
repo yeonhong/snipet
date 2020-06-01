@@ -23,13 +23,13 @@ namespace Roguelike2D
 		public float levelStartDelay = 2f;
 		public float turnDelay = 0.1f;
 		public int playerFoodPoints = 100;
-		public bool PlayersTurn { get; private set; } = true;
 
 		[SerializeField] private AudioClip gameOverSound = null;
 
 		private BoardManager boardScript;
 		private int level = 1;
 		private EnemyManager _enemyManager = null;
+		private bool _playersTurn = true;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -107,16 +107,16 @@ namespace Roguelike2D
 		}
 
 		public bool IsPlayersTurn() {
-			return PlayersTurn;
+			return _playersTurn;
 		}
 
 		public void EndPlayersTurn() {
-			PlayersTurn = false;
+			_playersTurn = false;
 			StartCoroutine(_enemyManager.MoveEnemies());
 		}
 
 		private void OnEndEnemyTurn(object sender, EventArgs e) {
-			PlayersTurn = true;
+			_playersTurn = true;
 		}
 	}
 }
