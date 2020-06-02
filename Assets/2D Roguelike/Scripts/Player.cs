@@ -122,7 +122,7 @@ namespace Roguelike2D
 		}
 
 		private void OnTurnEnd() {
-			OnEndPlayerTurn.Invoke(this, null);
+			OnEndPlayerTurn?.Invoke(this, null);
 		}
 
 		protected override void OnBumped<T>(T component) {

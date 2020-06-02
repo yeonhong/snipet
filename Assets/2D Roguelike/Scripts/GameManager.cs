@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
 
 namespace Roguelike2D
 {
@@ -12,22 +13,21 @@ namespace Roguelike2D
 	}
 
 	// todo : 재시작 기능을 추가한다
-	// todo : gamemanager 리펙토링
 
 	public class GameManager : MonoBehaviour, IPlayerManage
 	{
 		public static GameManager instance = null;
 
-		public float levelStartDelay = 2f;
-		public float turnDelay = 0.1f;
-		public int playerFoodPoints = 100;
+		[SerializeField] private float _levelStartDelay = 2f;
+		[SerializeField] private float _turnDelay = 0.1f;
+		[SerializeField] private int _playerFoodPoints = 100;
+		[SerializeField] private AudioClip _gameOverSound = null;
+		[SerializeField] private int _level = 1;
 
-		[SerializeField] private AudioClip gameOverSound = null;
-
-		private BoardManager _boardManager;
-		private int _level = 1;
-		private EnemyManager _enemyManager = null;
+		private const string PLAYER_TAG = "Player";
 		private bool _playersTurn = true;
+		private BoardManager _boardManager;
+		private EnemyManager _enemyManager = null;
 		private Player _player = null;
 
 		#region EventHandler
@@ -54,7 +54,7 @@ namespace Roguelike2D
 
 		private void AllocateEnemyManager() {
 			if (_enemyManager == null) {
-				_enemyManager = new EnemyManager(turnDelay);
+				_enemyManager = new EnemyManager(_turnDelay);
 				_enemyManager.OnEndEnemyTurn += OnEndEnemyTurn;
 			}
 		}
@@ -101,16 +101,25 @@ namespace Roguelike2D
 		}
 
 		private void InitGame(int level) {
-			_enemyManager.Init();
+			_enemyManager?.Init();
 			_boardManager?.SetupScene(level);
 			AllocatePlayerComponent();
+			ShowGameStart(level);
+		}
 
+		private void ShowGameStart(int level) {
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
-			Invoke("WaitStartDelay", levelStartDelay);
+
+			var waitStartDelay = DOTween.Sequence();
+			waitStartDelay.AppendInterval(_levelStartDelay);
+
+			waitStartDelay.OnComplete(() => {
+				OnGameStart?.Invoke(this, null);
+			});
 		}
 
 		private void AllocatePlayerComponent() {
-			var tPlayer = GameObject.FindGameObjectWithTag("Player").transform;
+			var tPlayer = GameObject.FindGameObjectWithTag(PLAYER_TAG).transform;
 			_player = tPlayer.GetComponent<Player>();
 			_player.OnFoodEmpty += Player_OnFoodEmpty;
 			_player.OnEndPlayerTurn += Player_OnEndPlayerTurn;
@@ -122,7 +131,7 @@ namespace Roguelike2D
 		}
 
 		private void Player_OnFoodEmpty(object sender, EventArgs e) {
-			SoundManager.instance.PlaySingle(gameOverSound);
+			SoundManager.instance.PlaySingle(_gameOverSound);
 			SoundManager.instance.StopMusic();
 
 			OnGameOver?.Invoke(this, new GameDayArgs(_level));
@@ -130,16 +139,12 @@ namespace Roguelike2D
 			enabled = false;
 		}
 
-		private void WaitStartDelay() {
-			OnGameStart?.Invoke(this, null);
-		}
-
 		public int GetPlayerFoodPoints() {
-			return playerFoodPoints;
+			return _playerFoodPoints;
 		}
 
 		public void SetPlayerFoodPoints(int amount) {
-			playerFoodPoints = amount;
+			_playerFoodPoints = amount;
 		}
 
 		public bool IsPlayersTurn() {
