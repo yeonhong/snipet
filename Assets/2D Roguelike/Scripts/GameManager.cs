@@ -30,6 +30,7 @@ namespace Roguelike2D
 		private int level = 1;
 		private EnemyManager _enemyManager = null;
 		private bool _playersTurn = true;
+		private Transform _tPlayer = null;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -58,9 +59,9 @@ namespace Roguelike2D
 				_enemyManager = new EnemyManager(turnDelay);
 				_enemyManager.OnEndEnemyTurn += OnEndEnemyTurn;
 			}
+
 			InitGame();
 		}
-
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void CallbackInitialization() {
@@ -78,6 +79,7 @@ namespace Roguelike2D
 
 			_enemyManager.Init();
 			boardScript?.SetupScene(level);
+			_tPlayer = GameObject.FindGameObjectWithTag("Player").transform;
 
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
 			Invoke("HideLevelImage", levelStartDelay);
@@ -112,7 +114,8 @@ namespace Roguelike2D
 
 		public void EndPlayersTurn() {
 			_playersTurn = false;
-			StartCoroutine(_enemyManager.MoveEnemies());
+
+			StartCoroutine(_enemyManager.MoveEnemies(_tPlayer));
 		}
 
 		private void OnEndEnemyTurn(object sender, EventArgs e) {

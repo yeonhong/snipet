@@ -29,11 +29,11 @@ namespace Roguelike2D
 
 		public void AddEnemy(Enemy enemy) => Enemies.Add(enemy);
 
-		public IEnumerator MoveEnemies() {
+		public IEnumerator MoveEnemies(Transform target) {
 			yield return new WaitForSeconds(_turnDelay);
 
 			for (int i = 0; i < Enemies.Count; i++) {
-				Enemies[i].MoveEnemy();
+				Enemies[i].MoveEnemy(target.position);
 				yield return new WaitForSeconds(Enemies[i].moveTime);
 			}
 
