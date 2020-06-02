@@ -27,7 +27,7 @@ namespace Roguelike2D
 			Enemies.Clear();
 		}
 
-		public void AddEnemy(Enemy enemy) => Enemies.Add(enemy);
+		public void Add(Enemy enemy) => Enemies.Add(enemy);
 
 		public IEnumerator MoveEnemies(Transform target) {
 			yield return new WaitForSeconds(_turnDelay);

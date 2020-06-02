@@ -24,11 +24,11 @@ namespace Roguelike2D
 
 		[SerializeField] private AudioClip gameOverSound = null;
 
-		private BoardManager boardManager;
-		private int level = 1;
+		private BoardManager _boardManager;
+		private int _level = 1;
 		private EnemyManager _enemyManager = null;
 		private bool _playersTurn = true;
-		private Player player = null;
+		private Player _player = null;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -49,7 +49,7 @@ namespace Roguelike2D
 			AllocateBoardManager();
 			AllocateEnemyManager();
 
-			InitGame();
+			InitGame(_level);
 		}
 
 		private void AllocateEnemyManager() {
@@ -60,9 +60,9 @@ namespace Roguelike2D
 		}
 
 		private void AllocateBoardManager() {
-			if (boardManager == null) {
-				boardManager = GetComponent<BoardManager>();
-				boardManager.OnEnemyCreated.AddListener(OnEnemyCreated);
+			if (_boardManager == null) {
+				_boardManager = GetComponent<BoardManager>();
+				_boardManager.OnEnemyCreated.AddListener(OnEnemyCreated);
 			}
 		}
 
@@ -77,11 +77,11 @@ namespace Roguelike2D
 		}
 
 		private void OnDestroy() {
-			boardManager.OnEnemyCreated.RemoveListener(OnEnemyCreated);
+			_boardManager.OnEnemyCreated.RemoveListener(OnEnemyCreated);
 		}
 
 		private void OnEnemyCreated(GameObject enemy) {
-			_enemyManager.AddEnemy(enemy.GetComponent<Enemy>());
+			_enemyManager.Add(enemy.GetComponent<Enemy>());
 		}
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -96,39 +96,41 @@ namespace Roguelike2D
 		}
 
 		private static void MoveToNextLevel() {
-			instance.level++;
-			instance.InitGame();
+			instance._level++;
+			instance.InitGame(instance._level);
 		}
 
-		private void InitGame() {
+		private void InitGame(int level) {
 			_enemyManager.Init();
-
-			boardManager?.SetupScene(level);
-
-			var tPlayer = GameObject.FindGameObjectWithTag("Player").transform;
-			player = tPlayer.GetComponent<Player>();
-			player.OnFoodEmpty += Player_OnFoodEmpty;
-			player.OnEndPlayerTurn += Player_OnEndPlayerTurn;
+			_boardManager?.SetupScene(level);
+			AllocatePlayerComponent();
 
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
-			Invoke("HideLevelImage", levelStartDelay);
+			Invoke("WaitStartDelay", levelStartDelay);
+		}
+
+		private void AllocatePlayerComponent() {
+			var tPlayer = GameObject.FindGameObjectWithTag("Player").transform;
+			_player = tPlayer.GetComponent<Player>();
+			_player.OnFoodEmpty += Player_OnFoodEmpty;
+			_player.OnEndPlayerTurn += Player_OnEndPlayerTurn;
 		}
 
 		private void Player_OnEndPlayerTurn(object sender, EventArgs e) {
 			_playersTurn = false;
-			StartCoroutine(_enemyManager.MoveEnemies(player.transform));
+			StartCoroutine(_enemyManager.MoveEnemies(_player.transform));
 		}
 
 		private void Player_OnFoodEmpty(object sender, EventArgs e) {
 			SoundManager.instance.PlaySingle(gameOverSound);
 			SoundManager.instance.StopMusic();
 
-			OnGameOver?.Invoke(this, new GameDayArgs(level));
+			OnGameOver?.Invoke(this, new GameDayArgs(_level));
 
 			enabled = false;
 		}
 
-		private void HideLevelImage() {
+		private void WaitStartDelay() {
 			OnGameStart?.Invoke(this, null);
 		}
 
