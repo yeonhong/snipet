@@ -27,9 +27,9 @@ namespace Roguelike2D
 
 	public class InputController_Mobile : InputContoller
 	{
-		private static readonly Vector2 emptyValue = -Vector2.one;
-		private Vector2 startPosition = emptyValue;
-		public float sensitivity { get; set; } = 1f;
+		private static readonly Vector2 EMPTY_VALE = -Vector2.one;
+		private Vector2 _startPosition = EMPTY_VALE;
+		public float _sensitivity { get; set; } = 1f;
 
 		public InputController_Mobile(IUnityService service) : base(service) { }
 
@@ -38,24 +38,31 @@ namespace Roguelike2D
 			vertical = 0;
 
 			if (_unityService.IsMouseButtonDown()) {
-				startPosition = _unityService.GetMousePosition();
+				_startPosition = _unityService.GetMousePosition();
 			}
 			else if (_unityService.IsMouseButtonUp()) {
 				Vector2 endPosition = _unityService.GetMousePosition();
+				float magnitude = (endPosition - _startPosition).magnitude;
 
-				if ((endPosition - startPosition).magnitude > sensitivity) {
-					float x = endPosition.x - startPosition.x;
-					float y = endPosition.y - startPosition.y;
-					if (Mathf.Abs(x) >= Mathf.Abs(y)) {
-						horizontal = x > 0 ? 1 : -1;
+				if (magnitude > _sensitivity) {
+					if (Mathf.Abs(GetX(endPosition)) >= Mathf.Abs(GetY(endPosition))) {
+						horizontal = GetX(endPosition) > 0 ? 1 : -1;
 					}
 					else {
-						vertical = y > 0 ? 1 : -1;
+						vertical = GetY(endPosition) > 0 ? 1 : -1;
 					}
 				}
 
-				startPosition = emptyValue;
+				_startPosition = EMPTY_VALE;
 			}
+		}
+
+		private float GetY(Vector2 endPosition) {
+			return endPosition.y - _startPosition.y;
+		}
+
+		private float GetX(Vector2 endPosition) {
+			return endPosition.x - _startPosition.x;
 		}
 	}
 }

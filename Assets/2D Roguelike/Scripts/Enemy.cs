@@ -1,53 +1,60 @@
 ﻿using UnityEngine;
 
-// todo : enemy 리펙토링 하기
 namespace Roguelike2D
 {
 	public class Enemy : MovingObject
 	{
-		public int playerDamage;
-		public AudioClip attackSound1;
-		public AudioClip attackSound2;
+		private const string ATTACK_ANIM = "enemyAttack";
+		[SerializeField] private int _attackPoint = 1;
+		[SerializeField] private AudioClip[] _attackSounds = null;
 
-		private Animator animator;
-		private bool skipMove;
+		private Animator _animator = null;
+		private bool _skipMove = false;
 
 		protected override void Start() {
-			animator = GetComponent<Animator>();
 			base.Start();
-		}
-
-		protected override bool AttemptMove<T>(int xDir, int yDir) {
-			if (skipMove) {
-				skipMove = false;
-				return false;
-
-			}
-
-			var isMoved = base.AttemptMove<T>(xDir, yDir);
-			skipMove = true;
-			return isMoved;
+			_animator = GetComponent<Animator>();
 		}
 
 		public void MoveEnemy(Vector3 target) {
-			int xDir = 0;
-			int yDir = 0;
-
-			if (Mathf.Abs(target.x - transform.position.x) < float.Epsilon) {
-				yDir = target.y > transform.position.y ? 1 : -1;
-			}
-			else {
-				xDir = target.x > transform.position.x ? 1 : -1;
+			if (IsSkipMove()) {
+				return;
 			}
 
-			AttemptMove<Player>(xDir, yDir);
+			GetMoveDirection(target, out int horizontal, out int vertical);
+			AttemptMove<Player>(horizontal, vertical);
 		}
 
-		protected override void OnBumped<T>(T component) {
-			var hitPlayer = component as Player;
-			hitPlayer.OnDamage(playerDamage);
-			animator.SetTrigger("enemyAttack");
-			SoundManager.instance.RandomizeSfx(attackSound1, attackSound2);
+		private void GetMoveDirection(Vector3 target, out int horizontal, out int vertical) {
+			horizontal = GetDirection(target.x, transform.position.x);
+			vertical = GetDirection(target.y, transform.position.y);
+			if (horizontal != 0) {
+				vertical = 0;
+			}
+		}
+
+		private bool IsSkipMove() {
+			_skipMove = !_skipMove;
+			return !_skipMove;
+		}
+
+		private int GetDirection(float dest, float curr) {
+			return dest > curr ? 1 : -1;
+		}
+
+		protected override void OnBumped<T>(T bumpedObject) {
+			var player = bumpedObject as Player;
+			player.OnDamage(_attackPoint);
+
+			_animator.SetTrigger(ATTACK_ANIM);
+
+			PlayAttackSound();
+		}
+
+		private void PlayAttackSound() {
+			if (_attackSounds != null) {
+				SoundManager.instance.RandomizeSfx(_attackSounds);
+			}
 		}
 	}
 }
