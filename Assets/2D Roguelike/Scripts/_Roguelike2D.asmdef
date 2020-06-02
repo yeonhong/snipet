@@ -1,3 +1,15 @@
-﻿{
-	"name": "Roguelike2D"
+{
+    "name": "Roguelike2D",
+    "references": [
+        "GUID:f4d51a8c91d80dc43ac2b5fa7cb95f2b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
