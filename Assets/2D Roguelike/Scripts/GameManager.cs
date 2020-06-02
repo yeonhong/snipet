@@ -9,8 +9,6 @@ namespace Roguelike2D
 		int GetPlayerFoodPoints();
 		void SetPlayerFoodPoints(int amount);
 		bool IsPlayersTurn();
-		void EndPlayersTurn();
-		void GameOver();
 	}
 
 	// todo : 재시작 기능을 추가한다
@@ -26,11 +24,11 @@ namespace Roguelike2D
 
 		[SerializeField] private AudioClip gameOverSound = null;
 
-		private BoardManager boardScript;
+		private BoardManager boardManager;
 		private int level = 1;
 		private EnemyManager _enemyManager = null;
 		private bool _playersTurn = true;
-		private Transform _tPlayer = null;
+		private Player player = null;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -47,31 +45,43 @@ namespace Roguelike2D
 		#endregion
 
 		private void Awake() {
-			if (instance == null) {
-				instance = this;
-			} else if (instance != this) {
-				Destroy(gameObject);
-			}
-
-			DontDestroyOnLoad(gameObject);
-
-			boardScript = GetComponent<BoardManager>();
-			boardScript.OnEnemyCreated.AddListener(OnEnemyCreated);
-
-			if (_enemyManager == null) {
-				_enemyManager = new EnemyManager(turnDelay);
-				_enemyManager.OnEndEnemyTurn += OnEndEnemyTurn;
-			}
+			AllocateInstance();
+			AllocateBoardManager();
+			AllocateEnemyManager();
 
 			InitGame();
 		}
 
+		private void AllocateEnemyManager() {
+			if (_enemyManager == null) {
+				_enemyManager = new EnemyManager(turnDelay);
+				_enemyManager.OnEndEnemyTurn += OnEndEnemyTurn;
+			}
+		}
+
+		private void AllocateBoardManager() {
+			if (boardManager == null) {
+				boardManager = GetComponent<BoardManager>();
+				boardManager.OnEnemyCreated.AddListener(OnEnemyCreated);
+			}
+		}
+
+		private void AllocateInstance() {
+			if (instance == null) {
+				instance = this;
+			}
+			else if (instance != this) {
+				Destroy(gameObject);
+			}
+			DontDestroyOnLoad(gameObject);
+		}
+
 		private void OnDestroy() {
-			boardScript.OnEnemyCreated.RemoveListener(OnEnemyCreated);
+			boardManager.OnEnemyCreated.RemoveListener(OnEnemyCreated);
 		}
 
 		private void OnEnemyCreated(GameObject enemy) {
-			AddEnemyToList(enemy.GetComponent<Enemy>());
+			_enemyManager.AddEnemy(enemy.GetComponent<Enemy>());
 		}
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -81,34 +91,45 @@ namespace Roguelike2D
 
 		private static void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
 			if (instance != null) {
-				instance.level++;
-				instance.InitGame();
+				MoveToNextLevel();
 			}
 		}
 
-		private void InitGame() {
+		private static void MoveToNextLevel() {
+			instance.level++;
+			instance.InitGame();
+		}
 
+		private void InitGame() {
 			_enemyManager.Init();
-			boardScript?.SetupScene(level);
-			_tPlayer = GameObject.FindGameObjectWithTag("Player").transform;
+
+			boardManager?.SetupScene(level);
+
+			var tPlayer = GameObject.FindGameObjectWithTag("Player").transform;
+			player = tPlayer.GetComponent<Player>();
+			player.OnFoodEmpty += Player_OnFoodEmpty;
+			player.OnEndPlayerTurn += Player_OnEndPlayerTurn;
 
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
 			Invoke("HideLevelImage", levelStartDelay);
 		}
 
-		private void HideLevelImage() {
-			OnGameStart?.Invoke(this, null);
+		private void Player_OnEndPlayerTurn(object sender, EventArgs e) {
+			_playersTurn = false;
+			StartCoroutine(_enemyManager.MoveEnemies(player.transform));
 		}
 
-		private void AddEnemyToList(Enemy enemy) => _enemyManager.AddEnemy(enemy);
-
-		public void GameOver() {
+		private void Player_OnFoodEmpty(object sender, EventArgs e) {
 			SoundManager.instance.PlaySingle(gameOverSound);
 			SoundManager.instance.StopMusic();
 
 			OnGameOver?.Invoke(this, new GameDayArgs(level));
 
 			enabled = false;
+		}
+
+		private void HideLevelImage() {
+			OnGameStart?.Invoke(this, null);
 		}
 
 		public int GetPlayerFoodPoints() {
@@ -121,12 +142,6 @@ namespace Roguelike2D
 
 		public bool IsPlayersTurn() {
 			return _playersTurn;
-		}
-
-		public void EndPlayersTurn() {
-			_playersTurn = false;
-
-			StartCoroutine(_enemyManager.MoveEnemies(_tPlayer));
 		}
 
 		private void OnEndEnemyTurn(object sender, EventArgs e) {

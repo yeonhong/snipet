@@ -47,7 +47,6 @@ MonoBehaviour:
   levelStartDelay: 2
   turnDelay: 0.1
   playerFoodPoints: 100
-  playersTurn: 1
   gameOverSound: {fileID: 8300000, guid: e2beefeb2273f4efe992adf5b8d67c29, type: 3}
 --- !u!114 &11433658
 MonoBehaviour:

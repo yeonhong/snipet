@@ -22,6 +22,8 @@ namespace Roguelike2D
 		public event EventHandler<UpdateFoodCountArgs> OnUpdatedFood;
 		public event EventHandler<GainFoodArgs> OnGainFood;
 		public event EventHandler<LossFoodArgs> OnLossFood;
+		public event EventHandler OnFoodEmpty;
+		public event EventHandler OnEndPlayerTurn;
 
 		public class UpdateFoodCountArgs : EventArgs
 		{
@@ -59,6 +61,12 @@ namespace Roguelike2D
 		protected override void Start() {
 			base.Start();
 
+			AllocateComponent();
+
+			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
+		}
+
+		private void AllocateComponent() {
 			animator = GetComponent<Animator>();
 
 			if (_gameManager == null) {
@@ -78,7 +86,6 @@ namespace Roguelike2D
 			}
 
 			_playerModel = new PlayerModel(_gameManager.GetPlayerFoodPoints());
-			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 		}
 
 		private void OnDisable() {
@@ -115,8 +122,7 @@ namespace Roguelike2D
 		}
 
 		private void OnTurnEnd() {
-			Debug.LogWarning("player move? " + _isMoving);
-			_gameManager.EndPlayersTurn();
+			OnEndPlayerTurn.Invoke(this, null);
 		}
 
 		protected override void OnBumped<T>(T component) {
@@ -152,7 +158,7 @@ namespace Roguelike2D
 
 		private void CheckIfGameOver() {
 			if (_playerModel.IsFoodEmpty) {
-				_gameManager.GameOver();
+				OnFoodEmpty.Invoke(this, null);
 			}
 		}
 
@@ -166,4 +172,3 @@ namespace Roguelike2D
 		}
 	}
 }
-
