@@ -54,13 +54,24 @@ namespace Roguelike2D
 			}
 
 			DontDestroyOnLoad(gameObject);
+
 			boardScript = GetComponent<BoardManager>();
+			boardScript.OnEnemyCreated.AddListener(OnEnemyCreated);
+
 			if (_enemyManager == null) {
 				_enemyManager = new EnemyManager(turnDelay);
 				_enemyManager.OnEndEnemyTurn += OnEndEnemyTurn;
 			}
 
 			InitGame();
+		}
+
+		private void OnDestroy() {
+			boardScript.OnEnemyCreated.RemoveListener(OnEnemyCreated);
+		}
+
+		private void OnEnemyCreated(GameObject enemy) {
+			AddEnemyToList(enemy.GetComponent<Enemy>());
 		}
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -89,7 +100,7 @@ namespace Roguelike2D
 			OnGameStart?.Invoke(this, null);
 		}
 
-		public void AddEnemyToList(Enemy enemy) => _enemyManager.AddEnemy(enemy);
+		private void AddEnemyToList(Enemy enemy) => _enemyManager.AddEnemy(enemy);
 
 		public void GameOver() {
 			SoundManager.instance.PlaySingle(gameOverSound);

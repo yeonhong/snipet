@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
+// todo : board manager 리펙토링
 namespace Roguelike2D
 {
+	public class CreateEnemyEvent : UnityEvent<GameObject> { }
+
 	public class BoardManager : MonoBehaviour
 	{
 		[Serializable]
@@ -19,7 +23,6 @@ namespace Roguelike2D
 			}
 		}
 
-
 		public int columns = 8;
 		public int rows = 8;
 		public Count wallCount = new Count(5, 9);
@@ -33,6 +36,8 @@ namespace Roguelike2D
 
 		private Transform boardHolder;
 		private List<Vector3> gridPositions = new List<Vector3>();
+
+		public CreateEnemyEvent OnEnemyCreated = new CreateEnemyEvent();
 
 		private void InitialiseList() {
 			gridPositions.Clear();
@@ -70,13 +75,14 @@ namespace Roguelike2D
 			return randomPosition;
 		}
 
-		private void LayoutObjectAtRandom(GameObject[] tileArray, int minimum, int maximum) {
+		private void LayoutObjectAtRandom(GameObject[] tileArray, int minimum, int maximum, UnityEvent<GameObject> OnCreated = null) {
 			int objectCount = Random.Range(minimum, maximum + 1);
 
 			for (int i = 0; i < objectCount; i++) {
-				Vector3 randomPosition = RandomPosition();
-				GameObject tileChoice = tileArray[Random.Range(0, tileArray.Length)];
-				Instantiate(tileChoice, randomPosition, Quaternion.identity);
+				var randomPosition = RandomPosition();
+				var tileChoice = tileArray[Random.Range(0, tileArray.Length)];
+				var instance = Instantiate(tileChoice, randomPosition, Quaternion.identity);
+				OnCreated?.Invoke(instance);
 			}
 		}
 
@@ -86,7 +92,7 @@ namespace Roguelike2D
 			LayoutObjectAtRandom(wallTiles, wallCount.minimum, wallCount.maximum);
 			LayoutObjectAtRandom(foodTiles, foodCount.minimum, foodCount.maximum);
 			int enemyCount = (int)Mathf.Log(level, 2f);
-			LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount);
+			LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount, OnEnemyCreated);
 			Instantiate(exit, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
 		}
 	}

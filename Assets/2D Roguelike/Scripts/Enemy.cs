@@ -13,7 +13,6 @@ namespace Roguelike2D
 		private bool skipMove;
 
 		protected override void Start() {
-			GameManager.instance.AddEnemyToList(this);
 			animator = GetComponent<Animator>();
 			base.Start();
 		}
