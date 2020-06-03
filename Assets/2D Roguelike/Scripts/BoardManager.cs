@@ -23,20 +23,19 @@ namespace Roguelike2D
 			}
 		}
 
-		public int columns = 8;
-		public int rows = 8;
-		public Count wallCount = new Count(5, 9);
-		public Count foodCount = new Count(1, 5);
-		public GameObject exit;
-		public GameObject[] floorTiles;
-		public GameObject[] wallTiles;
-		public GameObject[] foodTiles;
-		public GameObject[] enemyTiles;
-		public GameObject[] outerWallTiles;
+		[SerializeField] private int columns = 8;
+		[SerializeField] private int rows = 8;
+		[SerializeField] private Count wallCount = new Count(5, 9);
+		[SerializeField] private Count foodCount = new Count(1, 5);
+		[SerializeField] private GameObject exit = null;
+		[SerializeField] private GameObject[] floorTiles = null;
+		[SerializeField] private GameObject[] wallTiles = null;
+		[SerializeField] private GameObject[] foodTiles = null;
+		[SerializeField] private GameObject[] enemyTiles = null;
+		[SerializeField] private GameObject[] outerWallTiles = null;
 
 		private Transform boardHolder;
 		private List<Vector3> gridPositions = new List<Vector3>();
-
 		public CreateEnemyEvent OnEnemyCreated = new CreateEnemyEvent();
 
 		private void InitialiseList() {
@@ -95,5 +94,21 @@ namespace Roguelike2D
 			LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount, OnEnemyCreated);
 			Instantiate(exit, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
 		}
+
+		#region Validation Tests
+#if UNITY_EDITOR
+		public bool ValidateResources() {
+
+			if (exit == null) return false;
+			if (floorTiles == null) return false;
+			if (wallTiles == null) return false;
+			if (foodTiles == null) return false;
+			if (enemyTiles == null) return false;
+			if (outerWallTiles == null) return false;
+
+			return true;
+		}
+#endif 
+		#endregion
 	}
 }

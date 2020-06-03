@@ -154,5 +154,13 @@ namespace Roguelike2D
 		private void OnEndEnemyTurn(object sender, EventArgs e) {
 			_playersTurn = true;
 		}
+
+		#region Validation Tests
+#if UNITY_EDITOR
+		public bool ValidateResources() {
+			return _gameOverSound != null;
+		}
+#endif 
+		#endregion
 	}
 }
