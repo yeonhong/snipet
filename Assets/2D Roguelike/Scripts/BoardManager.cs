@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
-// todo : board manager 리펙토링
 namespace Roguelike2D
 {
 	public class CreateEnemyEvent : UnityEvent<GameObject> { }
