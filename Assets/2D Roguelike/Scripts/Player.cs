@@ -10,15 +10,18 @@ namespace Roguelike2D
 {
 	public class Player : MovingObject
 	{
-		[SerializeField] private float restartLevelDelay = 1f;
+		public const string TAG_NAME = "Player";
+
 		[SerializeField] private int wallDamage = 1;
 		public AudioClip[] moveSounds = null;
 
-		private Animator animator = null;
-		private PlayerModel _playerModel = null;
 		public IPlayerManage _gameManager { private get; set; }
 		public ISoundManager _soundManager { private get; set; }
 		public InputContoller _inputContoller { private get; set; }
+
+		private Animator _animator = null;
+		private PlayerModel _playerModel = null;
+		public int Food { get { return _playerModel.Food; } }
 
 		#region EventHandler
 		public event EventHandler<UpdateFoodCountArgs> OnUpdatedFood;
@@ -26,6 +29,7 @@ namespace Roguelike2D
 		public event EventHandler<LossFoodArgs> OnLossFood;
 		public event EventHandler OnFoodEmpty;
 		public event EventHandler OnEndPlayerTurn;
+		public event EventHandler OnEnterExit;
 
 		public class UpdateFoodCountArgs : EventArgs
 		{
@@ -69,7 +73,7 @@ namespace Roguelike2D
 		}
 
 		private void AllocateComponent() {
-			animator = GetComponent<Animator>();
+			_animator = GetComponent<Animator>();
 
 			if (_gameManager == null) {
 				_gameManager = GameManager.instance;
@@ -88,10 +92,6 @@ namespace Roguelike2D
 			}
 
 			_playerModel = new PlayerModel(_gameManager.GetPlayerFoodPoints());
-		}
-
-		private void OnDisable() {
-			_gameManager.SetPlayerFoodPoints(_playerModel.Food);
 		}
 
 		#region 이동관련
@@ -131,14 +131,14 @@ namespace Roguelike2D
 			var bumpedWall = component as Wall;
 			if (bumpedWall != null) {
 				bumpedWall.DamageWall(wallDamage);
-				animator.SetTrigger("playerChop");
+				_animator.SetTrigger("playerChop");
 			}
 		}
 		#endregion
 
 		private void OnTriggerEnter2D(Collider2D other) {
 			if (other.tag == "Exit") {
-				StartCoroutine(CoRestart());
+				OnEnterExit?.Invoke(this, null);
 				enabled = false;
 			}
 			else if (other.tag == "Food" || other.tag == "Soda") {
@@ -153,11 +153,6 @@ namespace Roguelike2D
 			food.Consume();
 		}
 
-		private IEnumerator CoRestart() {
-			yield return new WaitForSeconds(restartLevelDelay);
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
-		}
-
 		private void CheckIfGameOver() {
 			if (_playerModel.IsFoodEmpty) {
 				OnFoodEmpty.Invoke(this, null);
@@ -165,7 +160,7 @@ namespace Roguelike2D
 		}
 
 		public void OnDamage(int damage) {
-			animator.SetTrigger("playerHit");
+			_animator.SetTrigger("playerHit");
 
 			_playerModel.LoseFood(damage);
 			OnLossFood?.Invoke(this, new LossFoodArgs(damage, _playerModel.Food));

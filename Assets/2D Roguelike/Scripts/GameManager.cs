@@ -3,32 +3,33 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
 using Roguelike2D.Utils;
+using Roguelike2D.UI;
 
 namespace Roguelike2D
 {
 	public interface IPlayerManage
 	{
 		int GetPlayerFoodPoints();
-		void SetPlayerFoodPoints(int amount);
 		bool IsPlayersTurn();
 	}
-
-	// todo : 재시작 기능을 추가한다
 
 	public class GameManager : MonoBehaviour, IPlayerManage
 	{
 		public static GameManager instance = null;
 
 		[SerializeField] private float _levelStartDelay = 2f;
+		[SerializeField] private float _nextLevelDelay = 1f;
 		[SerializeField] private float _turnDelay = 0.1f;
-		[SerializeField] private int _playerFoodPoints = 100;
+		[SerializeField] private int _initFoodPoints = 100;
+		
 		[SerializeField] private AudioClip _gameOverSound = null;
 		[SerializeField] private int _level = 1;
 
-		private const string PLAYER_TAG = "Player";
-		private BoardManager _boardManager;
+		private BoardManager _boardManager = null;
 		private EnemyManager _enemyManager = null;
+		private UIManager _uiManager = null;
 		private Player _player = null;
+		private int _playerFoodPoints;
 
 		enum Turn
 		{
@@ -56,6 +57,9 @@ namespace Roguelike2D
 			AllocateInstance();
 			AllocateBoardManager();
 			AllocateEnemyManager();
+			AllocateUIManager();
+
+			SetPlayerFoodPoints(_initFoodPoints);
 
 			InitGame(_level);
 		}
@@ -74,6 +78,13 @@ namespace Roguelike2D
 			}
 		}
 
+		private void AllocateUIManager() {
+			if(_uiManager == null) {
+				_uiManager = GameObject.FindWithTag(UIManager.TAG_NAME).GetComponent<UIManager>();
+				_uiManager.OnRestartButtonClick += OnRestart;
+			}
+		}
+
 		private void AllocateInstance() {
 			if (instance == null) {
 				instance = this;
@@ -88,10 +99,6 @@ namespace Roguelike2D
 			_boardManager.OnEnemyCreated.RemoveListener(OnEnemyCreated);
 		}
 
-		private void OnEnemyCreated(GameObject enemy) {
-			_enemyManager.Add(enemy.GetComponent<Enemy>());
-		}
-
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void CallbackInitialization() {
 			SceneManager.sceneLoaded += OnSceneLoaded;
@@ -99,13 +106,21 @@ namespace Roguelike2D
 
 		private static void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
 			if (instance != null) {
-				MoveToNextLevel();
+				instance.AllocateUIManager();
+				instance.InitGame(instance._level);
 			}
 		}
 
-		private static void MoveToNextLevel() {
-			instance._level++;
-			instance.InitGame(instance._level);
+		public int GetPlayerFoodPoints() {
+			return _playerFoodPoints;
+		}
+
+		private void SetPlayerFoodPoints(int amount) {
+			_playerFoodPoints = amount;
+		}
+
+		public bool IsPlayersTurn() {
+			return _currentTurn == Turn.Player;
 		}
 
 		private void InitGame(int level) {
@@ -124,10 +139,32 @@ namespace Roguelike2D
 		}
 
 		private void AllocatePlayerComponent() {
-			var tPlayer = GameObject.FindGameObjectWithTag(PLAYER_TAG).transform;
+			var tPlayer = GameObject.FindGameObjectWithTag(Player.TAG_NAME).transform;
 			_player = tPlayer.GetComponent<Player>();
 			_player.OnFoodEmpty += OnFoodEmpty;
 			_player.OnEndPlayerTurn += OnEndPlayerTurn;
+			_player.OnEnterExit += OnEnterExit;
+		}
+
+		private void OnEnterExit(object sender, EventArgs e) {
+			_level++;
+			LoadLevelScene(_player.Food);
+		}
+
+		private void OnRestart(object sender, EventArgs e) {
+			_level = 0;
+			LoadLevelScene(_initFoodPoints);
+		}
+
+		private void LoadLevelScene(int startFoodPoints) {
+			SetPlayerFoodPoints(startFoodPoints);
+			DOTween.Sequence().Wait(_nextLevelDelay, () => {
+				SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+			});
+		}
+
+		private void OnEnemyCreated(GameObject enemy) {
+			_enemyManager.Add(enemy.GetComponent<Enemy>());
 		}
 
 		private void OnEndPlayerTurn(object sender, EventArgs e) {
@@ -146,18 +183,6 @@ namespace Roguelike2D
 
 		private void OnEndEnemyTurn(object sender, EventArgs e) {
 			_currentTurn = Turn.Player;
-		}
-
-		public int GetPlayerFoodPoints() {
-			return _playerFoodPoints;
-		}
-
-		public void SetPlayerFoodPoints(int amount) {
-			_playerFoodPoints = amount;
-		}
-
-		public bool IsPlayersTurn() {
-			return _currentTurn == Turn.Player;
 		}
 
 		#region Validation Tests

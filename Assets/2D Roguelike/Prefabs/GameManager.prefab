@@ -45,9 +45,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _levelStartDelay: 2
+  _nextLevelDelay: 1
   _turnDelay: 0.1
-  _playerFoodPoints: 100
+  _initFoodPoints: 100
   _gameOverSound: {fileID: 8300000, guid: e2beefeb2273f4efe992adf5b8d67c29, type: 3}
+  _level: 1
 --- !u!114 &11433658
 MonoBehaviour:
   m_ObjectHideFlags: 0

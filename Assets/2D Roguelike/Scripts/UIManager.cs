@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
@@ -6,10 +7,14 @@ namespace Roguelike2D.UI
 {
 	public class UIManager : MonoBehaviour
 	{
+		public const string TAG_NAME = "UIManager";
+
 		public GameObject restartButton = null;
 		public GameObject levelImage = null;
 		public Text levelText;
 		public FoodTextDisplayer foodTextDisplayer = null;
+
+		public event EventHandler OnRestartButtonClick;
 
 		private Player _player = null;
 		private GameManager _gameManager = null;
@@ -59,6 +64,7 @@ namespace Roguelike2D.UI
 		private void _gameManager_OnGameOver(object sender, GameManager.GameDayArgs e) {
 			levelText.text = $"After {e.Day} days, you starved.";
 			levelImage.SetActive(true);
+			restartButton.SetActive(true);
 		}
 
 		private void _gameManager_OnGameStart(object sender, System.EventArgs e) {
@@ -68,6 +74,15 @@ namespace Roguelike2D.UI
 		private void _gameManager_OnGameInit(object sender, GameManager.GameDayArgs e) {
 			levelText.text = $"Day {e.Day}";
 			levelImage.SetActive(true);
+			restartButton.SetActive(false);
+		}
+
+		bool isClicked = false;
+		public void OnClickRestartButton() {
+			if (isClicked) return;
+			isClicked = true;
+
+			OnRestartButtonClick?.Invoke(this, null);
 		}
 	}
 }
