@@ -33,11 +33,12 @@ namespace Roguelike2D
 
 		enum Turn
 		{
+			Wait,
 			Player,
 			Enemy,
 		}
 
-		private Turn _currentTurn = Turn.Player;
+		private Turn _currentTurn = Turn.Wait;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -131,9 +132,11 @@ namespace Roguelike2D
 		}
 
 		private void ShowGameStart(int level) {
+			_currentTurn = Turn.Wait;
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
 			
 			DOTween.Sequence().Wait(_levelStartDelay, () => {
+				_currentTurn = Turn.Player;
 				OnGameStart?.Invoke(this, null);
 			});
 		}
