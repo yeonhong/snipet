@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
+using Roguelike2D.Utils;
 
 namespace Roguelike2D
 {
@@ -25,10 +26,17 @@ namespace Roguelike2D
 		[SerializeField] private int _level = 1;
 
 		private const string PLAYER_TAG = "Player";
-		private bool _playersTurn = true;
 		private BoardManager _boardManager;
 		private EnemyManager _enemyManager = null;
 		private Player _player = null;
+
+		enum Turn
+		{
+			Player,
+			Enemy,
+		}
+
+		private Turn _currentTurn = Turn.Player;
 
 		#region EventHandler
 		public event EventHandler<GameDayArgs> OnGameInit;
@@ -109,11 +117,8 @@ namespace Roguelike2D
 
 		private void ShowGameStart(int level) {
 			OnGameInit?.Invoke(this, new GameDayArgs(level));
-
-			var waitStartDelay = DOTween.Sequence();
-			waitStartDelay.AppendInterval(_levelStartDelay);
-
-			waitStartDelay.OnComplete(() => {
+			
+			DOTween.Sequence().Wait(_levelStartDelay, () => {
 				OnGameStart?.Invoke(this, null);
 			});
 		}
@@ -121,22 +126,26 @@ namespace Roguelike2D
 		private void AllocatePlayerComponent() {
 			var tPlayer = GameObject.FindGameObjectWithTag(PLAYER_TAG).transform;
 			_player = tPlayer.GetComponent<Player>();
-			_player.OnFoodEmpty += Player_OnFoodEmpty;
-			_player.OnEndPlayerTurn += Player_OnEndPlayerTurn;
+			_player.OnFoodEmpty += OnFoodEmpty;
+			_player.OnEndPlayerTurn += OnEndPlayerTurn;
 		}
 
-		private void Player_OnEndPlayerTurn(object sender, EventArgs e) {
-			_playersTurn = false;
+		private void OnEndPlayerTurn(object sender, EventArgs e) {
+			_currentTurn = Turn.Enemy;
 			StartCoroutine(_enemyManager.MoveEnemies(_player.transform));
 		}
 
-		private void Player_OnFoodEmpty(object sender, EventArgs e) {
+		private void OnFoodEmpty(object sender, EventArgs e) {
 			SoundManager.instance.PlaySingle(_gameOverSound);
 			SoundManager.instance.StopMusic();
 
 			OnGameOver?.Invoke(this, new GameDayArgs(_level));
 
 			enabled = false;
+		}
+
+		private void OnEndEnemyTurn(object sender, EventArgs e) {
+			_currentTurn = Turn.Player;
 		}
 
 		public int GetPlayerFoodPoints() {
@@ -148,11 +157,7 @@ namespace Roguelike2D
 		}
 
 		public bool IsPlayersTurn() {
-			return _playersTurn;
-		}
-
-		private void OnEndEnemyTurn(object sender, EventArgs e) {
-			_playersTurn = true;
+			return _currentTurn == Turn.Player;
 		}
 
 		#region Validation Tests

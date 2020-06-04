@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
+using Roguelike2D.Utils;
 
 namespace Roguelike2D
 {
@@ -115,13 +117,13 @@ namespace Roguelike2D
 
 			if (isMoved) {
 				_soundManager.RandomizeSfx(moveSounds);
-				Invoke("OnTurnEnd", moveTime);
+				DOTween.Sequence().Wait(moveTime, () => { EndPlayerTurn(); });
 			} else {
-				OnTurnEnd();
+				EndPlayerTurn();
 			}
 		}
 
-		private void OnTurnEnd() {
+		private void EndPlayerTurn() {
 			OnEndPlayerTurn?.Invoke(this, null);
 		}
 
