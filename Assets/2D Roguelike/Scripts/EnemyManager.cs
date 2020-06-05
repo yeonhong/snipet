@@ -7,27 +7,26 @@ namespace Roguelike2D
 {
 	public class EnemyManager
 	{
-		public List<Enemy> Enemies { get; private set; }
-
-		private readonly float _turnDelay;
-
+		public IReadOnlyList<Enemy> Enemies { get { return _enemies; } }
 		public bool IsEnemyMoving { get; private set; }
-
 		public event EventHandler OnEndEnemyTurn;
 
+		private readonly float _turnDelay;
+		private List<Enemy> _enemies;
+
 		public EnemyManager(float turnDelay) {
-			Enemies = new List<Enemy>();
+			_enemies = new List<Enemy>();
 			_turnDelay = turnDelay;
 
-			Init();
+			Initialize();
 		}
 
-		public void Init() {
+		public void Initialize() {
 			IsEnemyMoving = false;
-			Enemies.Clear();
+			_enemies.Clear();
 		}
 
-		public void Add(Enemy enemy) => Enemies.Add(enemy);
+		public void Add(Enemy enemy) => _enemies.Add(enemy);
 
 		public IEnumerator MoveEnemies(Transform target) {
 			yield return new WaitForSeconds(_turnDelay);

@@ -127,7 +127,7 @@ namespace Roguelike2D
 		}
 
 		private void InitGame(int level) {
-			_enemyManager?.Init();
+			_enemyManager?.Initialize();
 			_boardManager?.SetupScene(level);
 			AllocatePlayerComponent();
 			ShowGameStart(level);
