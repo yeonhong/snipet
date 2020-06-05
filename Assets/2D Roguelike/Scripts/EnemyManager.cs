@@ -33,8 +33,12 @@ namespace Roguelike2D
 			yield return new WaitForSeconds(_turnDelay);
 
 			for (int i = 0; i < Enemies.Count; i++) {
-				Enemies[i].MoveEnemy(target.position);
-				yield return new WaitForSeconds(Enemies[i].moveTime);
+				Enemy enemy = Enemies[i];
+				enemy.Move(target.position);
+
+				while (enemy.IsMoving) {
+					yield return null;
+				}
 			}
 
 			yield return new WaitForSeconds(_turnDelay);

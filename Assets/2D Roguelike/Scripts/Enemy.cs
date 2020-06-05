@@ -16,7 +16,7 @@ namespace Roguelike2D
 			_animator = GetComponent<Animator>();
 		}
 
-		public void MoveEnemy(Vector3 target) {
+		public void Move(Vector3 target) {
 			if (IsSkipMove()) {
 				return;
 			}

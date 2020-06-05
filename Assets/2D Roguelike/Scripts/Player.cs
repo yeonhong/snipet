@@ -11,7 +11,7 @@ namespace Roguelike2D
 	public class Player : MovingObject
 	{
 		public const string TAG_NAME = "Player";
-
+		private const int MOVE_COST = 1;
 		[SerializeField] private int wallDamage = 1;
 		public AudioClip[] moveSounds = null;
 
@@ -92,11 +92,13 @@ namespace Roguelike2D
 			}
 
 			_playerModel = new PlayerModel(_gameManager.GetPlayerFoodPoints());
+
+			OnMoveEnd += Player_OnMoveEnd;
 		}
 
 		#region 이동관련
 		private void Update() {
-			if (!_gameManager.IsPlayersTurn() || _isMoving) {
+			if (!_gameManager.IsPlayersTurn() || IsMoving) {
 				return;
 			}
 
@@ -107,20 +109,22 @@ namespace Roguelike2D
 			}
 		}
 
-		// todo : 플레이어가 이동하는 중인데 적이 이동한다?
 		private void AttemptMove(int xDir, int yDir) {
-			var isMoved = base.AttemptMove<Wall>(xDir, yDir);
+			var isMove = base.AttemptMove<Wall>(xDir, yDir);
 
-			_playerModel.LoseFood(1);
+			_playerModel.LoseFood(MOVE_COST);
 			OnUpdatedFood?.Invoke(this, new UpdateFoodCountArgs(_playerModel.Food));
 			CheckIfGameOver();
 
-			if (isMoved) {
+			if (isMove) {
 				_soundManager.RandomizeSfx(moveSounds);
-				DOTween.Sequence().Wait(moveTime, () => { EndPlayerTurn(); });
 			} else {
 				EndPlayerTurn();
 			}
+		}
+
+		private void Player_OnMoveEnd(object sender, EventArgs e) {
+			EndPlayerTurn();
 		}
 
 		private void EndPlayerTurn() {
@@ -164,7 +168,6 @@ namespace Roguelike2D
 
 			_playerModel.LoseFood(damage);
 			OnLossFood?.Invoke(this, new LossFoodArgs(damage, _playerModel.Food));
-
 			CheckIfGameOver();
 		}
 	}
