@@ -13,6 +13,8 @@ namespace Roguelike2D
 		bool IsPlayersTurn();
 	}
 
+	// todo : 게임진행 통합테스트 만들어보기
+
 	public class GameManager : MonoBehaviour, IPlayerManage
 	{
 		public static GameManager instance = null;

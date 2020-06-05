@@ -35,15 +35,9 @@ namespace ValidationTests
 		}
 
 		[Test]
-		public void Wall컴포넌트에_MissingLink가_있는지_체크() {
+		public void Wall컴포넌트_프리팹_테스트() {
 			Wall wall = GetWallComponent();
-			Assert.That(wall.chopSound1 != null && wall.chopSound2 != null && wall.dmgSprite != null);
-		}
-
-		[Test]
-		public void Wall의_체력이_0_이상인가() {
-			var wall = GetWallComponent();
-			Assert.IsTrue(wall.hp > 0);
+			Assert.That(wall.ValidatePrefab());
 		}
 
 		private Wall GetWallComponent() {

@@ -5,24 +5,36 @@ namespace Roguelike2D
 {
 	public class Wall : MonoBehaviour
 	{
-		public AudioClip chopSound1 = null;
-		public AudioClip chopSound2 = null;
-		public Sprite dmgSprite = null;
-		public int hp = 3;
+		[SerializeField] private AudioClip chopSound1 = null;
+		[SerializeField] private AudioClip chopSound2 = null;
+		[SerializeField] private Sprite dmgSprite = null;
+		[SerializeField] private int _HP = 3;
 
-		private SpriteRenderer spriteRenderer = null;
+		private SpriteRenderer _spriteRenderer = null;
 
 		private void Awake() {
-			spriteRenderer = GetComponent<SpriteRenderer>();
+			_spriteRenderer = GetComponent<SpriteRenderer>();
 		}
 
 		public void DamageWall(int loss) {
 			SoundManager.instance.RandomizeSfx(chopSound1, chopSound2);
-			spriteRenderer.sprite = dmgSprite;
-			hp -= loss;
-			if (hp <= 0) {
+
+			_spriteRenderer.sprite = dmgSprite;
+
+			LosingHP(loss);
+		}
+
+		private void LosingHP(int amount) {
+			_HP -= amount;
+			if (_HP <= 0) {
 				gameObject.SetActive(false);
 			}
 		}
+
+#if UNITY_EDITOR
+		public bool ValidatePrefab() {
+			return chopSound1 != null && chopSound2 != null && dmgSprite != null && _HP > 0;
+		}
+#endif
 	}
 }
