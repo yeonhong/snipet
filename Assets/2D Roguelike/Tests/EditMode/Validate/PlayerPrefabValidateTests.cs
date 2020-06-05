@@ -37,8 +37,7 @@ namespace ValidationTests
 		[Test]
 		public void Play에_설정한_리소스_체크() {
 			var player = _prefab.GetComponent<Player>();
-
-			Assert.IsNotNull(player.moveSounds);
+			Assert.IsTrue(player.ValidateResources());
 		}
 	}
 

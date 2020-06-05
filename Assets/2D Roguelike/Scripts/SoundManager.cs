@@ -4,17 +4,18 @@ namespace Roguelike2D
 {
 	public class SoundManager : MonoBehaviour, ISoundManager
 	{
-		public AudioSource efxSource; 
-		public AudioSource musicSource;
-		public static SoundManager instance = null;
-		public float lowPitchRange = .95f;
-		public float highPitchRange = 1.05f;
+		[SerializeField] private AudioSource efxSource = null;
+		[SerializeField] private AudioSource musicSource = null;
+		[SerializeField] private float lowPitchRange = .95f;
+		[SerializeField] private float highPitchRange = 1.05f;
+
+		public static SoundManager Instance { get; private set; }
 
 		private void Awake() {
-			if (instance == null) {
-				instance = this;
+			if (Instance == null) {
+				Instance = this;
 			}
-			else if (instance != this) {
+			else if (Instance != this) {
 				Destroy(gameObject);
 			}
 

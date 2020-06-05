@@ -13,7 +13,7 @@ namespace Roguelike2D
 		public const string TAG_NAME = "Player";
 		private const int MOVE_COST = 1;
 		[SerializeField] private int wallDamage = 1;
-		public AudioClip[] moveSounds = null;
+		[SerializeField] private AudioClip[] moveSounds = null;
 
 		public IPlayerManage _gameManager { private get; set; }
 		public ISoundManager _soundManager { private get; set; }
@@ -80,7 +80,7 @@ namespace Roguelike2D
 			}
 
 			if (_soundManager == null) {
-				_soundManager = SoundManager.instance;
+				_soundManager = SoundManager.Instance;
 			}
 
 			if (_inputContoller == null) {
@@ -170,5 +170,11 @@ namespace Roguelike2D
 			OnLossFood?.Invoke(this, new LossFoodArgs(damage, _playerModel.Food));
 			CheckIfGameOver();
 		}
+
+#if UNITY_EDITOR
+		public bool ValidateResources() {
+			return moveSounds != null;
+		}
+#endif
 	}
 }

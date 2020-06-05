@@ -7,8 +7,8 @@ namespace Roguelike2D
 {
 	public abstract class MovingObject : MonoBehaviour
 	{
-		public float moveTime = 0.1f;
-		public LayerMask blockingLayer;
+		[SerializeField] private float moveTime = 0.1f;
+		[SerializeField] private LayerMask blockingLayer = 0;
 
 		public bool IsMoving { get; protected set; }
 		public IUnityService _unityService { protected get; set; }

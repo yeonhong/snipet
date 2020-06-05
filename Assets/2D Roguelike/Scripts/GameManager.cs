@@ -178,8 +178,8 @@ namespace Roguelike2D
 		}
 
 		private void OnFoodEmpty(object sender, EventArgs e) {
-			SoundManager.instance.PlaySingle(_gameOverSound);
-			SoundManager.instance.StopMusic();
+			SoundManager.Instance.PlaySingle(_gameOverSound);
+			SoundManager.Instance.StopMusic();
 
 			OnGameOver?.Invoke(this, new GameDayArgs(_level));
 

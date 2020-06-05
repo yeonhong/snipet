@@ -30,7 +30,7 @@ namespace Roguelike2D
 		
 		public void Consume() {
 			if (_soundManager == null) {
-				_soundManager = SoundManager.instance;
+				_soundManager = SoundManager.Instance;
 			}
 			_soundManager.RandomizeSfx(_fxSounds);
 			gameObject.SetActive(false);

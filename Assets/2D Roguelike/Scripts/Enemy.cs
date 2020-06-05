@@ -53,7 +53,7 @@ namespace Roguelike2D
 
 		private void PlayAttackSound() {
 			if (_attackSounds != null) {
-				SoundManager.instance.RandomizeSfx(_attackSounds);
+				SoundManager.Instance.RandomizeSfx(_attackSounds);
 			}
 		}
 	}

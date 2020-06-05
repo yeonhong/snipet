@@ -37,7 +37,7 @@ namespace ValidationTests
 		[Test]
 		public void Wall컴포넌트_프리팹_테스트() {
 			Wall wall = GetWallComponent();
-			Assert.That(wall.ValidatePrefab());
+			Assert.That(wall.ValidateResources());
 		}
 
 		private Wall GetWallComponent() {

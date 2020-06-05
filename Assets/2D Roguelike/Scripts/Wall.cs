@@ -17,7 +17,7 @@ namespace Roguelike2D
 		}
 
 		public void DamageWall(int loss) {
-			SoundManager.instance.RandomizeSfx(chopSound1, chopSound2);
+			SoundManager.Instance.RandomizeSfx(chopSound1, chopSound2);
 
 			_spriteRenderer.sprite = dmgSprite;
 
@@ -32,7 +32,7 @@ namespace Roguelike2D
 		}
 
 #if UNITY_EDITOR
-		public bool ValidatePrefab() {
+		public bool ValidateResources() {
 			return chopSound1 != null && chopSound2 != null && dmgSprite != null && _HP > 0;
 		}
 #endif

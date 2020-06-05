@@ -12,7 +12,7 @@ namespace Roguelike2D
 				Instantiate(gameManager);
 			}
 
-			if (SoundManager.instance == null) {
+			if (SoundManager.Instance == null) {
 				Instantiate(soundManager);
 			}
 		}
