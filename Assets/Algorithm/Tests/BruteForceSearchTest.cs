@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BruteForceSearchTest
@@ -53,6 +55,118 @@ namespace BruteForceSearchTest
 						}
 					}
 				}
+			}
+			return answer;
+		}
+	}
+
+	public class 소수찾기
+	{
+		private static string[] charData;
+		private static char[] words;
+		HashSet<int> combined = new HashSet<int>();
+
+		[Test]
+		[TestCase("17", ExpectedResult = 3)]
+		[TestCase("011", ExpectedResult = 2)]
+		[TestCase("0", ExpectedResult = 0)]
+		public int MySolution(string numbers) {
+
+			var arr = numbers.ToCharArray();
+			words = new char[arr.Length];
+			charData = new string[arr.Length];
+			genWord(arr.Length, 0, getRemainChar(arr, -1));
+
+			foreach(var n in combined) {
+				Debug.Log(n);
+			}
+
+			return combined.Where(o => IsPrime(o)).Count();
+		}
+
+		private void genWord(int n, int depth, char[] remainWords) {
+
+			for (int i = 0; i < n; i++) {
+				words[depth] = remainWords[i];
+				for (int f = depth + 1; f < words.Length; f++) {
+					words[f] = (char)0;
+				}
+
+				combined.Add(int.Parse(new string(words)));
+				genWord(n - 1, depth + 1, getRemainChar(remainWords, i));
+			}
+		}
+
+		private char[] getRemainChar(char[] source, int removeIdx) {
+			if (removeIdx == -1) {
+				return source;
+			}
+
+			char[] result = new char[source.Length - 1];
+			int index = 0;
+			for (int i = 0; i < source.Length; i++) {
+				if (i != removeIdx) {
+					result[index] = source[i];
+					index++;
+				}
+			}
+
+			return result;
+
+		}
+
+		private bool IsPrime(int number) {
+			if (number < 2) {
+				return false;
+			}
+			for (int f = 2; f < number; f++) {
+				if (number % f == 0) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+
+	public class 소수찾기2
+	{
+		List<int> makeNumbers = new List<int>();
+		private string chs;
+		void MakeNumber(char[] board, int num, bool[] mask) {
+			for (int i = 0; i < chs.Length; i++) {
+				if (mask[i]) continue;
+				board[num] = chs[i];
+				mask[i] = true;
+				makeNumbers.Add(int.Parse(new string(board)));
+				if (num >= chs.Length - 1) {
+					board[num] = '\0';
+					mask[i] = false;
+					return;
+				}
+				MakeNumber(board, num + 1, mask);
+				board[num] = '\0';
+				mask[i] = false;
+			}
+		}
+		public int solution(string numbers) {
+			int answer = 0;
+			chs = numbers;
+			MakeNumber(new char[chs.Length], 0, new bool[chs.Length]);
+			makeNumbers = makeNumbers.Distinct().ToList();
+			if (makeNumbers.Contains(0)) makeNumbers.Remove(0);
+			if (makeNumbers.Contains(1)) makeNumbers.Remove(1);
+			int max = makeNumbers.Max();
+			List<int> prime = new List<int>();//[Math.Pow(10,numbers.Length-1)];
+			for (int i = 1; i <= max; i++) {
+				prime.Add(i); //prime[i-1] = i;
+			}
+			for (int i = 2; i <= Math.Sqrt(max); i++) {
+				for (int j = i * 2; j <= max; j += i) {
+					prime[j - 1] = 0;
+				}
+			}
+			foreach (var item in makeNumbers) {
+				if (prime.Contains(item)) answer++;
 			}
 			return answer;
 		}
