@@ -3,7 +3,6 @@ namespace Grid2D
 {
 	public class DragAndDrop : MonoBehaviour
 	{
-
 		[Header("Restrictions")]
 		public bool considerScale = true;
 		public bool considerOtherObjects = true;
@@ -14,10 +13,10 @@ namespace Grid2D
 		public Vector4 currentPosition = new Vector4(1, 1, 1, 1);
 		private Vector2 gridOffset = Vector2.zero;
 		private Vector2 gridSize = Vector2.one;
-		private Vector3 screenPoint;
-		private Vector4 lastPos;
-		private Vector3 lastParentPos;
-		private Vector4 targetPos;
+		private Vector3 screenPoint = default;
+		private Vector4 lastPos = default;
+		private Vector3 lastParentPos = default;
+		private Vector4 targetPos = default;
 
 		private void Awake() {
 
@@ -42,10 +41,16 @@ namespace Grid2D
 
 		// Get recent values of the Grid
 		private void UpdateGridData() {
-			gridSize = FindObjectOfType<Grid>().gridSize;
-			gridOffset = FindObjectOfType<Grid>().GetGridOffset();
+			gridSize = GridMap.Instance.gridSize;
+			gridOffset = GridMap.Instance.GetGridOffset();
 		}
 
+		public void UpdateAll() {
+			UpdatePosition();
+			AddPosition(lastPos);
+		}
+
+		#region Drag 관련
 		private void OnMouseDown() {
 			// Remove the last position
 			RemovePosition(lastPos);
@@ -81,22 +86,11 @@ namespace Grid2D
 			transform.parent.position = SnapToGrid(screenPoint);
 		}
 
-		public void UpdateAll() {
-			UpdatePosition();
-			AddPosition(lastPos);
-		}
-
 		private void OnMouseUp() {
 			UpdateGridData();
 
 			// Save Target Pos
-			targetPos.x = transform.parent.position.x + (gridSize.x * 0.5f) + 0.5f;
-			targetPos.y = (transform.parent.position.x + (gridSize.x * 0.5f) + 0.5f) + transform.localScale.x - 1;
-
-			targetPos.z = -(transform.parent.position.y - (gridSize.y * 0.5f) - 0.5f);
-			targetPos.w = -(transform.parent.position.y - (gridSize.y * 0.5f) - 0.5f) + transform.localScale.y - 1;
-
-			// Debug.Log ("Target Position: " + targetPos);
+			targetPos = GetCurrentPos();
 
 			// Check if it is occupying the position of another object
 			if (considerOtherObjects) {
@@ -110,59 +104,48 @@ namespace Grid2D
 					UpdatePosition();
 					AddPosition(targetPos);
 
-				}
-				else { // If busy, add the saved position again
+				} else { // If busy, add the saved position again
 					AddPosition(lastPos);
 				}
-			}
-			else {
+			} else {
 				UpdatePosition();
 				AddPosition(targetPos);
 			}
+		} 
+		#endregion
+
+		private Vector4 GetCurrentPos() {
+			var parentPos = transform.parent.position;
+			Vector4 ret;
+			ret.x = (parentPos.x + (gridSize.x * 0.5f) + 0.5f);
+			ret.y = (parentPos.x + (gridSize.x * 0.5f) + 0.5f) + transform.localScale.x - 1;
+			ret.z = -(parentPos.y - (gridSize.y * 0.5f) - 0.5f);
+			ret.w = -(parentPos.y - (gridSize.y * 0.5f) - 0.5f) + transform.localScale.y - 1;
+			return ret;
 		}
 
 		private void AddPosition(Vector4 pos) {
-			var grid = FindObjectOfType<Grid>();
-			if (!grid.occupiedPositions.Contains(pos)) {
-				grid.occupiedPositions.Add(pos);
-				// Debug.Log ("Added: " + pos);
-			}
+			GridMap.Instance.AddPosition(pos);
 		}
 
 		private void RemovePosition(Vector4 pos) {
-			var grid = FindObjectOfType<Grid>();
-			if (grid.occupiedPositions.Contains(pos)) {
-				grid.occupiedPositions.Remove(pos);
-				// Debug.Log ("Removed: " + pos);
-			}
+			GridMap.Instance.RemovePosition(pos);
 		}
 
-		// Check if the target position is occupied
 		private bool IsOccupied() {
-			var occupied = FindObjectOfType<Grid>().occupiedPositions;
-			foreach (Vector4 pos in occupied) {
-				if (((targetPos.x >= pos.x && targetPos.x <= pos.y) || (targetPos.y >= pos.x && targetPos.y <= pos.y) || (pos.y >= targetPos.x && pos.y <= targetPos.y))
-					&& ((targetPos.z >= pos.z && targetPos.z <= pos.w) || (targetPos.w >= pos.z && targetPos.w <= pos.w) || (pos.w >= targetPos.z && pos.w <= targetPos.w))) {
-
-					transform.parent.position = lastParentPos;
-					currentPosition = lastPos;
-					// Debug.Log ("Wanted: " + wantedPos); 
-					// Debug.Log ("Occupied: " + pos);
-					// Debug.Log ("Can't move here");
-					return true;
-				}
+			if (GridMap.Instance.IsOccupied(targetPos)) {
+				transform.parent.position = lastParentPos;
+				currentPosition = lastPos;
+				return true;
 			}
+
 			return false;
 		}
 
 		// Update object position variable
 		private void UpdatePosition() {
-			currentPosition.x = transform.parent.position.x + (gridSize.x * 0.5f) + 0.5f;
-			currentPosition.y = (transform.parent.position.x + (gridSize.x * 0.5f) + 0.5f) + transform.localScale.x - 1;
-
-			currentPosition.z = -(transform.parent.position.y - (gridSize.y * 0.5f) - 0.5f);
-			currentPosition.w = -(transform.parent.position.y - (gridSize.y * 0.5f) - 0.5f) + transform.localScale.y - 1;
-
+			currentPosition = GetCurrentPos();
+			
 			// Save actual position
 			lastParentPos = transform.parent.position;
 			lastPos = currentPosition;
@@ -176,8 +159,6 @@ namespace Grid2D
 			UpdateGridData();
 			UpdatePosition();
 		}
-
-
 
 		// Function that allows you to move an object according to the Grid
 		private Vector3 SnapToGrid(Vector3 dragPos) {
