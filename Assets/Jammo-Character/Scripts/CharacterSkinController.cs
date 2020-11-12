@@ -11,13 +11,14 @@ public class CharacterSkinController : MonoBehaviour
     [ColorUsage(true,true)]
     public Color[] eyeColors;
     public enum EyePosition { normal, happy, angry, dead}
-    public EyePosition eyeState;
 
     // Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
         characterMaterials = GetComponentsInChildren<Renderer>();
+
+		Debug.Log($"find materials {characterMaterials.Length}");
         
     }
 
