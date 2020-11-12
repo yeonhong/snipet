@@ -20,35 +20,19 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: m_jammo_metal
-  m_Shader: {fileID: -6465566751694194690, guid: 6bd852d468af4f44e8073db1ead6b0c9,
-    type: 3}
+  m_Name: m_jammo_metal_bu
+  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_ShaderKeywords: _METALLICSPECGLOSSMAP _NORMALMAP _OCCLUSIONMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 2050
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - Texture2D_AD72F45A:
-        m_Texture: {fileID: 2800000, guid: 6a0fb4aa4de843c45a776e5a4ac9dd69, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - Texture2D_B63CD35E:
-        m_Texture: {fileID: 2800000, guid: 3a5a871d579c2da4094f823d674595eb, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - Texture2D_BC56C223:
-        m_Texture: {fileID: 2800000, guid: fb6e06c953f0d8045bc58e0f5a640f07, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - Texture2D_F1C573F8:
-        m_Texture: {fileID: 2800000, guid: f6c18262b3c0eba4bb830f3d91682a4f, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: fb6e06c953f0d8045bc58e0f5a640f07, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -120,7 +104,6 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Fresnel_Color: {r: 2, g: 0.8156863, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
